@@ -2,7 +2,7 @@ import os
 
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-DATABASE_DIR_PATH = os.path.join(BASE_PATH, 'database_sqlite')
+DATABASE_DIR_PATH = os.path.join(BASE_PATH, 'app/database_sqlite')
 
 
 class Config(object):
