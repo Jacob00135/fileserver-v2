@@ -1,6 +1,7 @@
 import os
 import unittest
 import sqlite3
+from werkzeug.test import TestResponse
 from flask import current_app, url_for
 from config import TestingConfig
 from app import create_app, db
@@ -26,6 +27,12 @@ class BaseUnittestCase(unittest.TestCase):
             result = url_for(endpoint, *args, **kwargs)
         return result
 
+    def verify_redirect(self, response: TestResponse, location: str) -> None:
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(len(response.history) == 1)
+        self.assertTrue(response.history[0].status_code == 302)
+        self.assertTrue(response.history[0].location == location)
+
     def login(self, user_name: str, user_password: str) -> Users:
         response = self.client.post(
             self.url_for('auth.login'),
@@ -36,21 +43,15 @@ class BaseUnittestCase(unittest.TestCase):
             },
             follow_redirects=True
         )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue(len(response.history) == 1)
-        self.assertTrue(response.history[0].status_code == 302)
-        self.assertTrue(response.history[0].location == self.url_for('main.index'))
+        self.verify_redirect(response, self.url_for('main.index'))
         user: Users = Users.query.filter_by(user_name=user_name).first()
         self.assertTrue(user.is_authenticated)
 
         return user
 
-    def logout(self):
+    def logout(self) -> None:
         response = self.client.post(self.url_for('auth.logout'), follow_redirects=True)
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue(len(response.history) == 1)
-        self.assertTrue(response.history[0].status_code == 302)
-        self.assertTrue(response.history[0].location == self.url_for('main.index'))
+        self.verify_redirect(response, self.url_for('main.index'))
 
 
 class BaseTestCase(BaseUnittestCase):

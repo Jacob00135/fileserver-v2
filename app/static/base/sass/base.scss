@@ -46,8 +46,12 @@ body {
             box-shadow: 0 0 0 0.25rem #ffffff5e;
         }
     }
+}
+/* 模态框共用样式 [end] */
 
-    /* 输入框 */
+/* 登录、修改密码模态框 [start] */
+.login-modal,
+.update-password-modal {
     input.form-control[type="text"],
     input.form-control[type="password"] {
         background-color: #ffffffe6;
@@ -56,12 +60,11 @@ body {
             box-shadow: 0 0 0 0.25rem #21028173;
         }
     }
-
 }
-/* 模态框共用样式 [end] */
+/* 登录、修改密码模态框 [end] */
 
 /* 登录失败时的警告框 [start] */
-.login-fail-alert {
+.top-alert {
     margin-left: -.75rem;
     margin-right: -.75rem;
 }

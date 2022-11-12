@@ -1,20 +1,20 @@
 ((window, document) => {
     'use strict';
 
-    // 设置登录模态框的隐藏控件的值：当前url
-    (() => {
-        const currentUrlInput = document.getElementById('current-url');
-        if (!currentUrlInput) return undefined;
-        currentUrlInput.setAttribute('value', location.pathname);
-    })();
+    // 设置隐藏控件的值：当前url
+    document.querySelectorAll('form input.current-url').forEach((input) => {
+        input.setAttribute('value', location.pathname);
+    });
 
-    // 自动关闭登录失败时的警告框
+    // 自动关闭警告框
     (() => {
-        const loginFailAlertCloseBtn = document.querySelector('.login-fail-alert .btn-close');
-        if (!loginFailAlertCloseBtn) return undefined;
-        setTimeout(() => {
-            loginFailAlertCloseBtn.click();
-        }, 3000);
+        let clickDelayTime = 3000;
+        document.querySelectorAll('#app .top-alert .btn-close').forEach((closeBtn) => {
+            setTimeout(() => {
+                closeBtn.click();
+            }, clickDelayTime);
+            clickDelayTime = clickDelayTime + 3000;
+        });
     })();
 
     // 登出按钮

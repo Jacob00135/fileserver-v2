@@ -20,62 +20,118 @@
 <body>
 
     <!-- 登录模态框 [start] -->
-    <div class="modal fade" id="login-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
-         data-bs-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content bg-secondary text-white">
+    {% if not current_user.is_authenticated %}
+        <div class="modal fade" id="login-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+             data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-secondary text-white">
 
-                <!-- 模态框头部 [start] -->
-                <div class="modal-header position-relative">
-                    <h5 class="modal-title w-100 text-center">登录</h5>
-                    <button type="button" class="btn-close position-absolute m-0" data-bs-dismiss="modal"
-                            aria-label="Close">
-                    </button>
+                    <!-- 模态框头部 [start] -->
+                    <div class="modal-header position-relative">
+                        <h5 class="modal-title w-100 text-center">登录</h5>
+                        <button type="button" class="btn-close position-absolute m-0" data-bs-dismiss="modal"
+                                aria-label="Close">
+                        </button>
+                    </div>
+                    <!-- 模态框头部 [end] -->
+
+                    <!-- 模态框内容 [start] -->
+                    <div class="modal-body mb-2">
+
+                        <!-- 登录表单 [start] -->
+                        <form action="{{ url_for('auth.login') }}" method="post" name="login">
+
+                            <!-- 隐藏的控件：记录当前页面路由 [start] -->
+                            <input type="text" class="d-none current-url" name="current-url" value="javascript"/>
+                            <!-- 隐藏的控件：记录当前页面路由 [end] -->
+
+                            <!-- 用户名 [start] -->
+                            <div class="mb-3">
+                                <label for="login-user-name" class="form-label">用户名</label>
+                                <input type="text" class="form-control" id="login-user-name" name="user-name" required
+                                       autocomplete="off"/>
+                            </div>
+                            <!-- 用户名 [end] -->
+
+                            <!-- 密码 [start] -->
+                            <div class="mb-3">
+                                <label for="login-user-password" class="form-label">密码</label>
+                                <input type="password" class="form-control" id="login-user-password"
+                                       name="user-password"
+                                       required autocomplete="off"/>
+                            </div>
+                            <!-- 密码 [end] -->
+
+                            <!-- 提交按钮 [start] -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-dark px-5 py-2">登录</button>
+                            </div>
+                            <!-- 提交按钮 [end] -->
+
+                        </form>
+                        <!-- 登录表单 [end] -->
+
+                    </div>
+                    <!-- 模态框内容 [end] -->
+
                 </div>
-                <!-- 模态框头部 [end] -->
-
-                <!-- 模态框内容 [start] -->
-                <div class="modal-body mb-2">
-
-                    <!-- 登录表单 [start] -->
-                    <form action="{{ url_for('auth.login') }}" method="post" name="login">
-
-                        <!-- 隐藏的控件：记录当前页面路由 [start] -->
-                        <input type="text" id="current-url" class="d-none" name="current-url" value="javascript"/>
-                        <!-- 隐藏的控件：记录当前页面路由 [end] -->
-
-                        <!-- 用户名 [start] -->
-                        <div class="mb-3">
-                            <label for="login-user-name" class="form-label">用户名</label>
-                            <input type="text" class="form-control" id="login-user-name" name="user-name" required
-                                   autocomplete="off"/>
-                        </div>
-                        <!-- 用户名 [end] -->
-
-                        <!-- 密码 [start] -->
-                        <div class="mb-3">
-                            <label for="login-user-password" class="form-label">密码</label>
-                            <input type="password" class="form-control" id="login-user-password" name="user-password"
-                                   required autocomplete="off"/>
-                        </div>
-                        <!-- 密码 [end] -->
-
-                        <!-- 提交按钮 [start] -->
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-dark px-5 py-2">登录</button>
-                        </div>
-                        <!-- 提交按钮 [end] -->
-
-                    </form>
-                    <!-- 登录表单 [end] -->
-
-                </div>
-                <!-- 模态框内容 [end] -->
-
             </div>
         </div>
-    </div>
+    {% endif %}
     <!-- 登录模态框 [end] -->
+
+    <!-- 修改密码模态框 [start] -->
+    {% if current_user.is_authenticated %}
+        <div class="modal fade" id="update-password-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+             data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-secondary text-white">
+
+                    <!-- 模态框头部 [start] -->
+                    <div class="modal-header position-relative">
+                        <h5 class="modal-title w-100 text-center">修改密码</h5>
+                        <button type="button" class="btn-close position-absolute m-0" data-bs-dismiss="modal"
+                                aria-label="Close">
+                        </button>
+                    </div>
+                    <!-- 模态框头部 [end] -->
+
+                    <!-- 模态框内容 [start] -->
+                    <div class="modal-body mb-2">
+
+                        <!-- 修改密码表单 [start] -->
+                        <form action="{{ url_for('auth.update_password') }}" method="post" name="update-password">
+
+                            <!-- 隐藏的控件：记录当前页面路由 [start] -->
+                            <input type="text" class="d-none current-url" name="current-url" value="javascript"/>
+                            <!-- 隐藏的控件：记录当前页面路由 [end] -->
+
+                            <!-- 新密码 [start] -->
+                            <div class="mb-3">
+                                <label for="new-password" class="form-label">新密码</label>
+                                <input type="password" class="form-control" id="new-password" name="new-password"
+                                       required autocomplete="off"/>
+                                <div class="form-text text-light">修改成功后需重新登录</div>
+                            </div>
+                            <!-- 新密码 [end] -->
+
+                            <!-- 提交按钮 [start] -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-dark px-5 py-2">提交</button>
+                            </div>
+                            <!-- 提交按钮 [end] -->
+
+                        </form>
+                        <!-- 修改密码表单 [end] -->
+
+                    </div>
+                    <!-- 模态框内容 [end] -->
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <!-- 修改密码模态框 [end] -->
 
     <!-- 导航栏 [start] -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="top-navbar">
@@ -124,7 +180,8 @@
                     <!-- 修改密码按钮 [start] -->
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link rounded-2 px-3" href="javascript:;">修改密码</a>
+                        <a class="nav-link rounded-2 px-3" href="javascript:;" data-bs-toggle="modal"
+                           data-bs-target="#update-password-modal">修改密码</a>
                     </li>
                     {% endif %}
                     <!-- 修改密码按钮 [end] -->
@@ -170,7 +227,7 @@
 
         <!-- 登录失败时的闪现消息 [start] -->
         {% for message in get_flashed_messages() %}
-        <div class="alert alert-danger alert-dismissible fade show login-fail-alert" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show top-alert" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
