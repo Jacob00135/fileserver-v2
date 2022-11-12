@@ -11,7 +11,6 @@ class Config(object):
 
     # 管理员用户和密码
     FLASK_ADMIN_USERNAME = 'admin'
-    FLASK_ADMIN_PASSWORD = os.environ.get('FLASK_ADMIN_PASSWORD')
 
     # 数据库配置
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -29,6 +28,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     DATABASE_PATH = os.path.join(DATABASE_DIR_PATH, 'db.sqlite')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(DATABASE_PATH)
+    FLASK_ADMIN_PASSWORD = os.environ.get('FLASK_ADMIN_PASSWORD')
 
 
 class ProductionConfig(Config):
@@ -36,12 +36,14 @@ class ProductionConfig(Config):
     DEBUG = False
     DATABASE_PATH = os.path.join(DATABASE_DIR_PATH, 'db.sqlite')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(DATABASE_PATH)
+    FLASK_ADMIN_PASSWORD = os.environ.get('FLASK_ADMIN_PASSWORD')
 
 
 class TestingConfig(Config):
     TESTING = True
     DATABASE_PATH = os.path.join(DATABASE_DIR_PATH, 'db_test.sqlite')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(DATABASE_PATH)
+    FLASK_ADMIN_PASSWORD = '123456'
 
 
 config = {

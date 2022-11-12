@@ -1,0 +1,60 @@
+@charset "UTF-8";
+/* 工具类 [start] */
+/* 工具类 [end] */
+/* 页面宏观 [start] */
+body {
+  background-color: #52575c;
+}
+
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+/* 页面宏观 [end] */
+/* 导航栏 [start] */
+#top-navbar {
+  /* 导航栏链接的背景色变化 */
+  /* “管理”下拉菜单的弹出位置 */
+}
+#top-navbar .navbar-brand:hover,
+#top-navbar #navbar-menu .nav-link:hover {
+  background-color: #52575c;
+}
+#top-navbar .navbar-admin-dropdown .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+
+/* 导航栏 [end] */
+/* 模态框共用样式 [start] */
+.modal {
+  /* 右上角关闭按钮 */
+  /* 输入框 */
+}
+.modal .modal-header .btn-close {
+  top: 1rem;
+  right: 1rem;
+}
+.modal .modal-header .btn-close:focus {
+  box-shadow: 0 0 0 0.25rem #ffffff5e;
+}
+.modal input.form-control[type=text],
+.modal input.form-control[type=password] {
+  background-color: #ffffffe6;
+}
+.modal input.form-control[type=text]:focus,
+.modal input.form-control[type=password]:focus {
+  box-shadow: 0 0 0 0.25rem #21028173;
+}
+
+/* 模态框共用样式 [end] */
+/* 登录失败时的警告框 [start] */
+.login-fail-alert {
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+}
+
+/* 登录失败时的警告框 [end] */
+
+/*# sourceMappingURL=base.css.map */

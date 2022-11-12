@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>{% block title %}{% endblock title %}</title>
+
+    <!-- Bootstrap Style -->
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap-icons.css"/>
+
+    <!-- Global Style -->
+    <link rel="stylesheet" href="/static/base/css/base.css"/>
+
+    {% block style %}
+    {% endblock style %}
+</head>
+<body>
+
+    <!-- 登录模态框 [start] -->
+    <div class="modal fade" id="login-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">登录</h5>
+                    <button type="button" class="btn-close position-absolute m-0" data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 登录表单 [start] -->
+                    <form action="{{ url_for('auth.login') }}" method="post" name="login">
+
+                        <!-- 隐藏的控件：记录当前页面路由 [start] -->
+                        <input type="text" id="current-url" class="d-none" name="current-url" value="javascript"/>
+                        <!-- 隐藏的控件：记录当前页面路由 [end] -->
+
+                        <!-- 用户名 [start] -->
+                        <div class="mb-3">
+                            <label for="login-user-name" class="form-label">用户名</label>
+                            <input type="text" class="form-control" id="login-user-name" name="user-name" required
+                                   autocomplete="off"/>
+                        </div>
+                        <!-- 用户名 [end] -->
+
+                        <!-- 密码 [start] -->
+                        <div class="mb-3">
+                            <label for="login-user-password" class="form-label">密码</label>
+                            <input type="password" class="form-control" id="login-user-password" name="user-password"
+                                   required autocomplete="off"/>
+                        </div>
+                        <!-- 密码 [end] -->
+
+                        <!-- 提交按钮 [start] -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-dark px-5 py-2">登录</button>
+                        </div>
+                        <!-- 提交按钮 [end] -->
+
+                    </form>
+                    <!-- 登录表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 登录模态框 [end] -->
+
+    <!-- 导航栏 [start] -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="top-navbar">
+        <div class="container">
+
+            <!-- 主页图标 [start] -->
+            <a class="navbar-brand px-3 rounded-2" href="{{ url_for('main.index') }}">
+                <i class="bi bi-folder"></i>
+            </a>
+            <!-- 主页图标 [end] -->
+
+            <!-- 菜单按钮 [start] -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbar-menu" aria-controls="navbar-menu"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- 菜单按钮 [start] -->
+
+            <!-- 导航栏内容 [start] -->
+            <div class="collapse navbar-collapse justify-content-between" id="navbar-menu">
+
+                <!-- 靠左的内容 [start] -->
+                <ul class="navbar-nav">
+                </ul>
+                <!-- 靠左的内容 [end] -->
+
+                <!-- 靠右的内容 [start] -->
+                <ul class="navbar-nav">
+
+                    <!-- 登录按钮 [start] -->
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <form class="d-none" action="{{ url_for('auth.logout') }}" method="post" name="logout">
+                            </form>
+                            <a class="nav-link rounded-2 px-3 logout" href="javascript:;">登出</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link rounded-2 px-3" href="javascript:;" data-bs-toggle="modal"
+                               data-bs-target="#login-modal">登录</a>
+                        </li>
+                    {% endif %}
+                    <!-- 登录按钮 [end] -->
+
+                    <!-- 修改密码按钮 [start] -->
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link rounded-2 px-3" href="javascript:;">修改密码</a>
+                    </li>
+                    {% endif %}
+                    <!-- 修改密码按钮 [end] -->
+
+                    <!-- 管理员功能下拉菜单 [start] -->
+                    {% if current_user.is_admin() %}
+                    <li class="nav-item dropdown navbar-admin-dropdown">
+
+                        <!-- 下拉菜单头 [start] -->
+                        <a class="nav-link dropdown-toggle rounded-2 px-3" href="javascript:;"
+                           id="navbar-admin-dropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            管理
+                        </a>
+                        <!-- 下拉菜单头 [end] -->
+
+                        <!-- 下拉菜单条目 [start] -->
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbar-admin-dropdown">
+                            <li>
+                                <a class="dropdown-item visible-dir" href="javascript:;">可见目录</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item user-manager" href="javascript:;">用户管理</a>
+                            </li>
+                        </ul>
+                        <!-- 下拉菜单条目 [end] -->
+
+                    </li>
+                    {% endif %}
+                    <!-- 管理员功能下拉菜单 [end] -->
+
+                </ul>
+                <!-- 靠右的内容 [end] -->
+
+            </div>
+            <!-- 导航栏内容 [end] -->
+        </div>
+    </nav>
+    <!-- 导航栏 [end] -->
+
+    <!-- 页面主体内容 [start] -->
+    <div id="app" class="container">
+
+        <!-- 登录失败时的闪现消息 [start] -->
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-danger alert-dismissible fade show login-fail-alert" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        <!-- 登录失败时的闪现消息 [end] -->
+
+        {% block content %}
+        {% endblock content %}
+
+    </div>
+    <!-- 页面主体内容 [end] -->
+
+    <!-- Bootstrap JavaScript -->
+    <script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Global JavaScript -->
+    <script src="/static/base/js/base.js"></script>
+
+    {% block javascript %}
+    {% endblock javascript %}
+</body>
+</html>

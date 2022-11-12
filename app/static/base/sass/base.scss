@@ -1,0 +1,68 @@
+@import "../../_variable.scss";
+
+/* 工具类 [start] */
+/* 工具类 [end] */
+
+/* 页面宏观 [start] */
+body {
+    background-color: #52575c;
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+/* 页面宏观 [end] */
+
+/* 导航栏 [start] */
+#top-navbar {
+
+    /* 导航栏链接的背景色变化 */
+    .navbar-brand:hover,
+    #navbar-menu .nav-link:hover {
+        background-color: #52575c;
+    }
+
+    /* “管理”下拉菜单的弹出位置 */
+    .navbar-admin-dropdown {
+        .dropdown-menu {
+            left: auto;
+            right: 0;
+        }
+    }
+}
+/* 导航栏 [end] */
+
+/* 模态框共用样式 [start] */
+.modal {
+
+    /* 右上角关闭按钮 */
+    .modal-header .btn-close {
+        top: 1rem;
+        right: 1rem;
+
+        &:focus {
+            box-shadow: 0 0 0 0.25rem #ffffff5e;
+        }
+    }
+
+    /* 输入框 */
+    input.form-control[type="text"],
+    input.form-control[type="password"] {
+        background-color: #ffffffe6;
+
+        &:focus {
+            box-shadow: 0 0 0 0.25rem #21028173;
+        }
+    }
+
+}
+/* 模态框共用样式 [end] */
+
+/* 登录失败时的警告框 [start] */
+.login-fail-alert {
+    margin-left: -.75rem;
+    margin-right: -.75rem;
+}
+/* 登录失败时的警告框 [end] */
