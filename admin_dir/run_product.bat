@@ -5,5 +5,5 @@ set FLASK_APP=file_server.py
 set FLASK_ENV=production
 set FLASK_DEBUG=0
 set FLASK_CONFIG=production
-set FLASK_ADMIN_PASSWORD=197011
+set FLASK_ADMIN_PASSWORD=123456
 flask run -h 0.0.0.0 -p 80

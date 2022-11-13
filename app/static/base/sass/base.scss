@@ -1,6 +1,10 @@
 @import "../../_variable.scss";
 
 /* 工具类 [start] */
+.mx-n3 {
+    margin-left: -.75rem;
+    margin-right: -.75rem;
+}
 /* 工具类 [end] */
 
 /* 页面宏观 [start] */
@@ -62,10 +66,3 @@ body {
     }
 }
 /* 登录、修改密码模态框 [end] */
-
-/* 登录失败时的警告框 [start] */
-.top-alert {
-    margin-left: -.75rem;
-    margin-right: -.75rem;
-}
-/* 登录失败时的警告框 [end] */

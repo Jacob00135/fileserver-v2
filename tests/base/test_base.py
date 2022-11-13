@@ -89,3 +89,15 @@ class BaseTestCase(BaseUnittestCase):
         """自动插入管理员记录"""
         result = self.cursor.execute('SELECT count(*) FROM `users` WHERE user_name="admin";').fetchone()
         self.assertTrue(result[0] == 1)
+
+    def test_405_to_404(self):
+        """405响应404"""
+        response = self.client.get(self.url_for('auth.logout'), follow_redirects=True)
+        self.assertTrue(response.status_code == 404)
+
+    def test_403_to_404(self):
+        """403响应404"""
+        # TODO 待测试
+        # response = self.client.get(self.url_for('auth.logout'), follow_redirects=True)
+        # self.assertTrue(response.status_code == 404)
+        pass
