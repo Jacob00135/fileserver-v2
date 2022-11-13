@@ -3,7 +3,7 @@ from flask_login import login_user, login_required, current_user, logout_user
 from config import ErrorInfo
 from app import db
 from app.model import Users
-from app.untils import check_legal
+from app.untils import check_legal, update_user_password
 
 auth = Blueprint('auth', __name__)
 
@@ -56,22 +56,14 @@ def update_password():
     # 获取发送登录请求时所在的页面路由
     current_url = request.form.get('current-url', '/')
 
-    # 检查密码合法性
+    # 修改密码
     password = request.form.get('new-password', '')
-    check_result = check_legal(password, 'user_password')
-    if not check_result['legal']:
-        flash(check_result['error_info'])
-        return redirect(current_url)
-
-    # 检查是否与原密码一样
-    if current_user.verify_password(password):
-        flash(ErrorInfo.USER_PASSWORD_SAME)
+    update_result = update_user_password(current_user, password)
+    if not update_result['success']:
+        flash(update_result['error_info'])
         return redirect(current_url)
 
     # 修改密码成功，需要重新登录
-    current_user.user_password = password
-    db.session.add(current_user)
-    db.session.commit()
     logout_user()
 
     return redirect(url_for('main.index'))

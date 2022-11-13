@@ -1,5 +1,7 @@
 import re
-from config import UserNameError, UserPasswordError
+from config import ErrorInfo, UserNameError, UserPasswordError
+from app import db
+from app.model import Users
 
 
 def check_legal(string: str, check_type: str) -> dict:
@@ -31,3 +33,21 @@ def check_legal(string: str, check_type: str) -> dict:
         return {'legal': False, 'error_info': error_obj.ILLEGAL_ERROR}
 
     return {'legal': True, 'error_info': ''}
+
+
+def update_user_password(user: Users, password: str) -> dict:
+    # 检查密码合法性
+    check_result = check_legal(password, 'user_password')
+    if not check_result['legal']:
+        return {'success': False, 'error_info': check_result['error_info']}
+
+    # 检查是否与原密码一样
+    if user.verify_password(password):
+        return {'success': False, 'error_info': ErrorInfo.USER_PASSWORD_SAME}
+
+    # 通过检验，修改密码
+    user.user_password = password
+    db.session.add(user)
+    db.session.commit()
+
+    return {'success': True, 'error_info': ''}
