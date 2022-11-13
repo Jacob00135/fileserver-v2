@@ -48,8 +48,15 @@ class LoginTestCase(BaseUnittestCase):
         self.assertTrue(response.history[-1].location == self.url_for('main.index'))
 
     def test_update_password_illegal(self):
+        """修改密码失败：密码不合法"""
+        admin = self.login('admin', '123456')
+        response = self.request_update_password('!abcdef@()_-012345')
+        self.verify_redirect(response, self.url_for('main.index'))
+        self.assertTrue(admin.verify_password('123456'))
+
+    def test_update_password(self):
         """修改密码成功"""
         admin = self.login('admin', '123456')
-        response = self.request_update_password('654321')
+        response = self.request_update_password('abcdef@()_-01234')
         self.verify_redirect(response, self.url_for('main.index'))
-        self.assertTrue(admin.verify_password('654321'))
+        self.assertTrue(admin.verify_password('abcdef@()_-01234'))

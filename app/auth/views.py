@@ -1,7 +1,9 @@
 from flask import Blueprint, request, flash, redirect, jsonify, url_for
 from flask_login import login_user, login_required, current_user, logout_user
+from config import ErrorInfo
 from app import db
 from app.model import Users
+from app.untils import check_legal
 
 auth = Blueprint('auth', __name__)
 
@@ -14,7 +16,10 @@ def login():
 
     # 已登录的用户不可重复登录
     if current_user.is_authenticated:
-        return jsonify({'status': 0, 'message': '已登录用户不可重复登录'})
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.USER_LOGGED
+        })
 
     # 获取发送登录请求时所在的页面路由
     current_url = request.form.get('current-url', '/')
@@ -23,13 +28,13 @@ def login():
     user_name = request.form.get('user-name')
     user: Users = Users.query.filter_by(user_name=user_name).first()
     if user_name is None or user is None:
-        flash('用户名不存在！')
+        flash(ErrorInfo.USER_NOT_EXISTS)
         return redirect(current_url)
 
     # 检查密码
     user_password = request.form.get('user-password')
     if user_password is None or not user.verify_password(user_password):
-        flash('密码错误！')
+        flash(ErrorInfo.USER_PASSWORD_WRONG)
         return redirect(current_url)
 
     # 登录成功
@@ -52,14 +57,15 @@ def update_password():
     current_url = request.form.get('current-url', '/')
 
     # 检查密码合法性
-    password = request.form.get('new-password')
-    if password is None or len(password) < 6 or len(password) > 16:
-        flash('密码长度只能是6到16！')
+    password = request.form.get('new-password', '')
+    check_result = check_legal(password, 'user_password')
+    if not check_result['legal']:
+        flash(check_result['error_info'])
         return redirect(current_url)
 
     # 检查是否与原密码一样
     if current_user.verify_password(password):
-        flash('不能与原密码一样！')
+        flash(ErrorInfo.USER_PASSWORD_SAME)
         return redirect(current_url)
 
     # 修改密码成功，需要重新登录
