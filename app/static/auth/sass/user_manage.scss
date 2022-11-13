@@ -1,0 +1,50 @@
+@import "../../_variable.scss";
+
+.action-group {
+
+    /* border-radius */
+    .btn {
+        border-radius: 0;
+    }
+
+    #all-select {
+        border-top-left-radius: .25rem;
+    }
+
+    #batch-delete {
+        border-bottom-left-radius: .25rem;
+    }
+
+    /* border */
+    #no-select,
+    #anti-select {
+        border-left-color: $bg-secondary;
+    }
+
+    /* background-color */
+    & > .btn-info:hover {
+        border-color: $bg-primary;
+        background-color: $bg-primary;
+    }
+}
+
+.user-list > .list-group-item {
+    cursor: pointer;
+
+    &:first-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    &[data-active="1"] {
+        background-color: $bg-dark !important;
+    }
+
+    input[name="user-name"] {
+        cursor: pointer;
+    }
+
+    .user-name {
+        line-height: 31px;
+    }
+}

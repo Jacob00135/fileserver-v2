@@ -6,17 +6,6 @@
         input.setAttribute('value', location.pathname);
     });
 
-    // 自动关闭警告框
-    (() => {
-        let clickDelayTime = 3000;
-        document.querySelectorAll('#app .top-alert .btn-close').forEach((closeBtn) => {
-            setTimeout(() => {
-                closeBtn.click();
-            }, clickDelayTime);
-            clickDelayTime = clickDelayTime + 3000;
-        });
-    })();
-
     // 登出按钮
     (() => {
         const logoutLink = document.querySelector('#navbar-menu .logout');

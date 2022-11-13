@@ -1,0 +1,80 @@
+{% extends "base/base.html" %}
+
+{% block title %}用户管理{% endblock title %}
+
+{% block style %}
+    <link rel="stylesheet" href="/static/auth/css/user_manage.css"/>
+{% endblock style %}
+
+{% block content %}
+<h1 class="text-white text-center my-4">用户管理</h1>
+<div class="row">
+    <div class="col">
+
+        <!-- 按钮组 [start] -->
+        <div>
+            <div class="btn-group d-flex action-group" role="group">
+                <button type="button" class="btn btn-info gray-shadow" id="all-select">全选</button>
+                <button type="button" class="btn btn-info gray-shadow" id="no-select">全不选</button>
+                <button type="button" class="btn btn-info gray-shadow" id="anti-select">反选</button>
+            </div>
+            <div class="btn-group d-flex action-group" role="group">
+                <button type="button" class="btn btn-primary gray-shadow" id="add-user">添加用户</button>
+                <button type="button" class="btn btn-danger gray-shadow" id="batch-delete">批量删除</button>
+            </div>
+        </div>
+        <!-- 按钮组 [end] -->
+
+        <!-- 用户列表 [start] -->
+        <ul class="list-group mb-5 shadow user-list">
+
+            <!-- 每一个用户行 [start] -->
+            {% for user in users %}
+                <li class="list-group-item bg-secondary d-flex justify-content-between" data-active="0"
+                    data-event="{{ loop.index0 }}">
+
+                    <!-- 多选复选框 -->
+                    <input class="form-check-input mt-0 me-2 text-truncate align-self-center" type="checkbox"
+                           name="user-name" value="{{ user.user_name }}" data-event="{{ loop.index0 }}"/>
+
+                    <!-- 显示用户名的区域 -->
+                    <span class="text-light text-truncate flex-fill user-name"
+                          data-event="{{ loop.index0 }}">{{ user.user_name }}</span>
+
+                    <!-- 操作按钮 [start] -->
+                    <div class="action d-flex">
+
+                        <!-- 删除按钮 -->
+                        <button type="button" class="btn btn-danger btn-sm gray-shadow me-1 delete" title="删除">
+                            <i class="bi bi-dash"></i>
+                        </button>
+
+                        <!-- 更改密码按钮 -->
+                        <button type="button" class="btn btn-info btn-sm gray-shadow update-password"
+                                title="修改密码">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+                    </div>
+                    <!-- 操作按钮 [end] -->
+
+                </li>
+            {% endfor %}
+            <!-- 每一个用户行 [end] -->
+
+            <!-- 当用户列表没有用户时要显示的内容 [start] -->
+            {% if not users %}
+                <p class="text-light text-center fs-5 my-5">没有用户</p>
+            {% endif %}
+            <!-- 当用户列表没有用户时要显示的内容 [end] -->
+
+        </ul>
+        <!-- 用户列表 [end] -->
+
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+    <script src="/static/auth/js/user_manage.js"></script>
+{% endblock javascript %}

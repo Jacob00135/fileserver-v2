@@ -1,4 +1,7 @@
 import re
+from functools import wraps
+from flask import abort
+from flask_login import current_user
 from config import ErrorInfo, UserNameError, UserPasswordError
 from app import db
 from app.model import Users
@@ -51,3 +54,12 @@ def update_user_password(user: Users, password: str) -> dict:
     db.session.commit()
 
     return {'success': True, 'error_info': ''}
+
+
+def admin_required(func):
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        if not current_user.is_admin():
+            abort(403)
+        return func(*args, **kwargs)
+    return decorator

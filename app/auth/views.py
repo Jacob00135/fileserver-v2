@@ -1,9 +1,8 @@
-from flask import Blueprint, request, flash, redirect, jsonify, url_for
+from flask import Blueprint, request, flash, redirect, jsonify, url_for, render_template
 from flask_login import login_user, login_required, current_user, logout_user
 from config import ErrorInfo
-from app import db
 from app.model import Users
-from app.untils import check_legal, update_user_password
+from app.untils import update_user_password, admin_required
 
 auth = Blueprint('auth', __name__)
 
@@ -67,3 +66,12 @@ def update_password():
     logout_user()
 
     return redirect(url_for('main.index'))
+
+
+@auth.route('/user_manage')
+@admin_required
+def user_manage():
+    # 查询所有用户，除了管理员
+    users = Users.query.filter(Users.user_name != 'admin').all()
+
+    return render_template('auth/user_manage.html', users=users)
