@@ -19,6 +19,30 @@
 </head>
 <body>
 
+    <!-- 代替alert的提示模态框 [start] -->
+    <div class="modal fade" id="hint-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center"></h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2"></div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 代替alert的提示模态框 [start] -->
+
     <!-- 登录模态框 [start] -->
     {% if not current_user.is_authenticated %}
         <div class="modal fade" id="login-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
@@ -48,15 +72,15 @@
                             <!-- 用户名 [start] -->
                             <div class="mb-3">
                                 <label for="login-user-name" class="form-label">用户名</label>
-                                <input type="text" class="form-control" id="login-user-name" name="user-name" required
-                                       autocomplete="off"/>
+                                <input type="text" class="form-control dark-mode-input" id="login-user-name"
+                                       name="user-name" required autocomplete="off"/>
                             </div>
                             <!-- 用户名 [end] -->
 
                             <!-- 密码 [start] -->
                             <div class="mb-3">
                                 <label for="login-user-password" class="form-label">密码</label>
-                                <input type="password" class="form-control" id="login-user-password"
+                                <input type="password" class="form-control dark-mode-input" id="login-user-password"
                                        name="user-password"
                                        required autocomplete="off"/>
                             </div>
@@ -109,7 +133,7 @@
                             <!-- 新密码 [start] -->
                             <div class="mb-3">
                                 <label for="new-password" class="form-label">新密码</label>
-                                <input type="password" class="form-control" id="new-password" name="new-password"
+                                <input type="password" class="form-control dark-mode-input" id="new-password" name="new-password"
                                        required autocomplete="off"/>
                                 <div class="form-text text-light">修改成功后需重新登录</div>
                             </div>
@@ -133,6 +157,11 @@
     {% endif %}
     <!-- 修改密码模态框 [end] -->
 
+    <!-- 用于继承的模态框块 [start] -->
+    {% block modal %}
+    {% endblock modal %}
+    <!-- 用于继承的模态框块 [end] -->
+
     <!-- 导航栏 [start] -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="top-navbar">
         <div class="container-md">
@@ -144,9 +173,8 @@
             <!-- 主页图标 [end] -->
 
             <!-- 菜单按钮 [start] -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbar-menu" aria-controls="navbar-menu"
-                    aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu"
+                    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <!-- 菜单按钮 [start] -->

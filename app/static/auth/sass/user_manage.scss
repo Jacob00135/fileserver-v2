@@ -1,6 +1,6 @@
 @import "../../_variable.scss";
 
-.action-group {
+#app .action-group {
 
     /* border-radius */
     .btn {
@@ -28,7 +28,7 @@
     }
 }
 
-.user-list > .list-group-item {
+#app .user-list > .list-group-item {
     cursor: pointer;
 
     &:first-child {
@@ -40,7 +40,7 @@
         background-color: $bg-dark !important;
     }
 
-    input[name="user-name"] {
+    input[name="user-name"][type="checkbox"] {
         cursor: pointer;
     }
 

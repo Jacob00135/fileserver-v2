@@ -1,40 +1,40 @@
-.action-group {
+#app .action-group {
   /* border-radius */
   /* border */
   /* background-color */
 }
-.action-group .btn {
+#app .action-group .btn {
   border-radius: 0;
 }
-.action-group #all-select {
+#app .action-group #all-select {
   border-top-left-radius: 0.25rem;
 }
-.action-group #batch-delete {
+#app .action-group #batch-delete {
   border-bottom-left-radius: 0.25rem;
 }
-.action-group #no-select,
-.action-group #anti-select {
+#app .action-group #no-select,
+#app .action-group #anti-select {
   border-left-color: #6c757d;
 }
-.action-group > .btn-info:hover {
+#app .action-group > .btn-info:hover {
   border-color: #0d6efd;
   background-color: #0d6efd;
 }
 
-.user-list > .list-group-item {
+#app .user-list > .list-group-item {
   cursor: pointer;
 }
-.user-list > .list-group-item:first-child {
+#app .user-list > .list-group-item:first-child {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-.user-list > .list-group-item[data-active="1"] {
+#app .user-list > .list-group-item[data-active="1"] {
   background-color: #212529 !important;
 }
-.user-list > .list-group-item input[name=user-name] {
+#app .user-list > .list-group-item input[name=user-name][type=checkbox] {
   cursor: pointer;
 }
-.user-list > .list-group-item .user-name {
+#app .user-list > .list-group-item .user-name {
   line-height: 31px;
 }
 

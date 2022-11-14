@@ -38,7 +38,7 @@ def check_legal(string: str, check_type: str) -> dict:
     return {'legal': True, 'error_info': ''}
 
 
-def update_user_password(user: Users, password: str) -> dict:
+def check_and_update_password(user: Users, password: str) -> dict:
     # 检查密码合法性
     check_result = check_legal(password, 'user_password')
     if not check_result['legal']:

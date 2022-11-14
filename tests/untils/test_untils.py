@@ -1,7 +1,7 @@
 from tests.base.test_base import BaseUnittestCase
 from config import ErrorInfo
 from app.model import Users
-from app.untils import check_legal, update_user_password
+from app.untils import check_legal, check_and_update_password
 
 
 class CheckLegalFuncTestCase(BaseUnittestCase):
@@ -60,25 +60,25 @@ class CheckLegalFuncTestCase(BaseUnittestCase):
         self.assertTrue(check_result['error_info'] == '')
 
 
-class UpdateUserPasswordTestCase(BaseUnittestCase):
+class CheckAndUpdatePasswordTestCase(BaseUnittestCase):
 
     def test_password_illegal(self):
-        """update_user_password函数：用户密码不合法"""
+        """check_and_update_password函数：用户密码不合法"""
         admin: Users = Users.query.filter_by(user_name='admin').first()
-        update_result = update_user_password(admin, '[!123456]')
+        update_result = check_and_update_password(admin, '[!123456]')
         self.assertFalse(update_result['success'])
         self.assertTrue(update_result['error_info'] == ErrorInfo.USER_PASSWORD_ILLEGAL)
 
     def test_password_same(self):
-        """update_user_password函数：与原密码相同"""
+        """check_and_update_password函数：与原密码相同"""
         admin: Users = Users.query.filter_by(user_name='admin').first()
-        update_result = update_user_password(admin, '123456')
+        update_result = check_and_update_password(admin, '123456')
         self.assertFalse(update_result['success'])
         self.assertTrue(update_result['error_info'] == ErrorInfo.USER_PASSWORD_SAME)
 
     def test_update_success(self):
-        """update_user_password函数：修改成功"""
+        """check_and_update_password函数：修改成功"""
         admin: Users = Users.query.filter_by(user_name='admin').first()
-        update_result = update_user_password(admin, '654321')
+        update_result = check_and_update_password(admin, '654321')
         self.assertTrue(update_result['success'])
         self.assertTrue(update_result['error_info'] == '')

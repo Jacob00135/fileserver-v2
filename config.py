@@ -56,6 +56,7 @@ class ErrorInfo(object):
     # 用户信息相关
     USER_NAME_NULL = '用户名不能为空！'
     USER_NOT_EXISTS = '用户名不存在！'
+    USER_EXISTS = '用户已存在！'
     USER_NAME_ILLEGAL = '用户名不合法：只能是数字字母和@()_-，且长度是6~16'
     USER_LOGGED = '已登录用户不可重复登录'
     USER_PASSWORD_NULL = '密码不能为空！'

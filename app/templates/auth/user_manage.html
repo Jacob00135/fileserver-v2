@@ -6,6 +6,193 @@
     <link rel="stylesheet" href="/static/auth/css/user_manage.css"/>
 {% endblock style %}
 
+{% block modal %}
+    <!-- 添加用户模态框 [start] -->
+    <div class="modal fade" id="add-user-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">添加用户</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 添加用户表单 [start] -->
+                    <form action="{{ url_for('auth.add_user') }}" method="post" name="add-user">
+
+                        <!-- 用户名 [start] -->
+                        <div class="mb-3">
+                            <label for="login-user-name" class="form-label">用户名</label>
+                            <input type="text" class="form-control dark-mode-input" id="login-user-name"
+                                   name="user-name" required autocomplete="off"/>
+                        </div>
+                        <!-- 用户名 [end] -->
+
+                        <!-- 密码 [start] -->
+                        <div class="mb-3">
+                            <label for="login-user-password" class="form-label">密码</label>
+                            <input type="password" class="form-control dark-mode-input" id="login-user-password"
+                                   name="user-password" required autocomplete="off"/>
+                        </div>
+                        <!-- 密码 [end] -->
+
+                        <!-- 提交按钮 [start] -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-dark px-5 py-2">提交</button>
+                        </div>
+                        <!-- 提交按钮 [end] -->
+
+                    </form>
+                    <!-- 添加用户表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 添加用户模态框 [end] -->
+
+    <!-- 删除单个用户模态框 [start] -->
+    <div class="modal fade" id="delete-user-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">警告</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 删除单用户表单 [start] -->
+                    <form action="{{ url_for('auth.delete_user') }}" method="post" name="delete-user">
+
+                        确定要删除用户<span class="bg-danger bg-opacity-75 px-1 rounded-1 user-name"></span>吗？
+
+                        <input type="text" class="d-none" name="user-name" value="javascript" required />
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger gray-shadow me-4">删除</button>
+                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                    <!-- 删除单用户表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 删除单个用户模态框 [end] -->
+
+    <!-- 删除多个用户模态框 [start] -->
+    <div class="modal fade" id="delete-multi-user-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">警告</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 删除多用户表单 [start] -->
+                    <form action="{{ url_for('auth.delete_user') }}" method="post" name="delete-multi-user">
+
+                        确定要删除以下用户吗？
+
+                        <div class="user-name-list">
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger gray-shadow me-4">删除</button>
+                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                    <!-- 删除多用户表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 删除多个用户模态框 [end] -->
+
+    <!-- 修改密码模态框 [start] -->
+    <div class="modal fade" id="update-user-password-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">修改密码</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 修改密码表单 [start] -->
+                    <form action="{{ url_for('auth.update_user_password') }}" method="post" name="update-user-password">
+
+                        <!-- 要修改密码的用户的用户名 [start] -->
+                        <input type="text" class="d-none" name="user-name" value="javascript" required/>
+                        <!-- 要修改密码的用户的用户名 [end] -->
+
+                        <!-- 新密码 [start] -->
+                        <div class="mb-3">
+                            <label for="new-user-password" class="form-label">新密码</label>
+                            <input type="password" class="form-control dark-mode-input" id="new-user-password"
+                                   name="new-password" required autocomplete="off"/>
+                        </div>
+                        <!-- 新密码 [end] -->
+
+                        <!-- 提交按钮 [start] -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-dark px-5 py-2">提交</button>
+                        </div>
+                        <!-- 提交按钮 [end] -->
+
+                    </form>
+                    <!-- 修改密码表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 修改密码模态框 [end] -->
+{% endblock modal %}
+
 {% block content %}
 <h1 class="text-white text-center my-4">用户管理</h1>
 <div class="row">
@@ -19,7 +206,8 @@
                 <button type="button" class="btn btn-info gray-shadow" id="anti-select">反选</button>
             </div>
             <div class="btn-group d-flex action-group" role="group">
-                <button type="button" class="btn btn-primary gray-shadow" id="add-user">添加用户</button>
+                <button type="button" class="btn btn-primary gray-shadow" id="add-user" data-bs-toggle="modal"
+                    data-bs-target="#add-user-modal">添加用户</button>
                 <button type="button" class="btn btn-danger gray-shadow" id="batch-delete">批量删除</button>
             </div>
         </div>
@@ -45,13 +233,14 @@
                     <div class="action d-flex">
 
                         <!-- 删除按钮 -->
-                        <button type="button" class="btn btn-danger btn-sm gray-shadow me-1 delete" title="删除">
+                        <button type="button" class="btn btn-danger btn-sm gray-shadow me-1 delete" title="删除"
+                                data-user-name="{{ user.user_name }}">
                             <i class="bi bi-dash"></i>
                         </button>
 
                         <!-- 更改密码按钮 -->
-                        <button type="button" class="btn btn-info btn-sm gray-shadow update-password"
-                                title="修改密码">
+                        <button type="button" class="btn btn-info btn-sm gray-shadow update-password" title="修改密码"
+                                data-user-name="{{ user.user_name }}">
                             <i class="bi bi-pencil"></i>
                         </button>
 
@@ -62,14 +251,14 @@
             {% endfor %}
             <!-- 每一个用户行 [end] -->
 
-            <!-- 当用户列表没有用户时要显示的内容 [start] -->
-            {% if not users %}
-                <p class="text-light text-center fs-5 my-5">没有用户</p>
-            {% endif %}
-            <!-- 当用户列表没有用户时要显示的内容 [end] -->
-
         </ul>
         <!-- 用户列表 [end] -->
+
+        <!-- 当用户列表没有用户时要显示的内容 [start] -->
+        {% if not users %}
+            <p class="text-light text-center fs-5 my-5">没有用户</p>
+        {% endif %}
+        <!-- 当用户列表没有用户时要显示的内容 [end] -->
 
     </div>
 </div>

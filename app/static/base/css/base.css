@@ -11,7 +11,14 @@
   box-shadow: 0 0 0 0.25rem #ffffff5e !important;
 }
 
-/* 单行文本截断表示 */
+/* 输入框背景色与阴影 */
+.dark-mode-input {
+  background-color: #ffffffe6;
+}
+.dark-mode-input:focus {
+  box-shadow: 0 0 0 0.25rem #21028173;
+}
+
 /* 工具类 [end] */
 /* 页面宏观 [start] */
 body {
@@ -49,20 +56,5 @@ body {
 }
 
 /* 模态框共用样式 [end] */
-/* 登录、修改密码模态框 [start] */
-.login-modal input.form-control[type=text],
-.login-modal input.form-control[type=password],
-.update-password-modal input.form-control[type=text],
-.update-password-modal input.form-control[type=password] {
-  background-color: #ffffffe6;
-}
-.login-modal input.form-control[type=text]:focus,
-.login-modal input.form-control[type=password]:focus,
-.update-password-modal input.form-control[type=text]:focus,
-.update-password-modal input.form-control[type=password]:focus {
-  box-shadow: 0 0 0 0.25rem #21028173;
-}
-
-/* 登录、修改密码模态框 [end] */
 
 /*# sourceMappingURL=base.css.map */

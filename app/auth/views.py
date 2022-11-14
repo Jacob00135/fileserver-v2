@@ -1,8 +1,9 @@
 from flask import Blueprint, request, flash, redirect, jsonify, url_for, render_template
 from flask_login import login_user, login_required, current_user, logout_user
 from config import ErrorInfo
+from app import db
 from app.model import Users
-from app.untils import update_user_password, admin_required
+from app.untils import check_legal, check_and_update_password, admin_required
 
 auth = Blueprint('auth', __name__)
 
@@ -57,7 +58,7 @@ def update_password():
 
     # 修改密码
     password = request.form.get('new-password', '')
-    update_result = update_user_password(current_user, password)
+    update_result = check_and_update_password(current_user, password)
     if not update_result['success']:
         flash(update_result['error_info'])
         return redirect(current_url)
@@ -73,5 +74,77 @@ def update_password():
 def user_manage():
     # 查询所有用户，除了管理员
     users = Users.query.filter(Users.user_name != 'admin').all()
+    users = list(reversed(users))
 
     return render_template('auth/user_manage.html', users=users)
+
+
+@auth.route('/add_user', methods=['POST'])
+@admin_required
+def add_user():
+    # 检查用户名
+    user_name = request.form.get('user-name', '')
+    check_result = check_legal(user_name, 'user_name')
+    if not check_result['legal']:
+        flash(check_result['error_info'])
+        return redirect(url_for('auth.user_manage'))
+
+    # 检查相同用户名的用户是否已存在
+    if Users.query.filter_by(user_name=user_name).first() is not None:
+        flash(ErrorInfo.USER_EXISTS)
+        return redirect(url_for('auth.user_manage'))
+
+    # 检查密码
+    user_password = request.form.get('user-password', '')
+    check_result = check_legal(user_password, 'user_password')
+    if not check_result['legal']:
+        flash(check_result['error_info'])
+        return redirect(url_for('auth.user_manage'))
+
+    # 检查通过，添加用户
+    user = Users(user_name=user_name, user_password=user_password)
+    db.session.add(user)
+    db.session.commit()
+
+    return redirect(url_for('auth.user_manage'))
+
+
+@auth.route('/delete_user', methods=['POST'])
+@admin_required
+def delete_user():
+    # 需要考虑批量删除的情况：只要有1个不合法，就全都不删除
+    delete_users = []
+    for user_name in request.form.getlist('user-name'):
+        # 检查用户是否存在
+        user = Users.query.filter_by(user_name=user_name).first()
+        if user is None:
+            flash(ErrorInfo.USER_NOT_EXISTS)
+            return redirect(url_for('auth.user_manage'))
+
+        # 检查通过，加入待删除列表
+        delete_users.append(user)
+
+    # 删除用户
+    for user in delete_users:
+        db.session.delete(user)
+        db.session.commit()
+
+    return redirect(url_for('auth.user_manage'))
+
+
+@auth.route('/update_user_password', methods=['POST'])
+@admin_required
+def update_user_password():
+    # 检查用户是否存在
+    user_name = request.form.get('user-name', '')
+    user = Users.query.filter_by(user_name=user_name).first()
+    if user is None:
+        flash(ErrorInfo.USER_NOT_EXISTS)
+        return redirect(url_for('auth.user_manage'))
+
+    # 检查密码
+    password = request.form.get('new-password', '')
+    update_result = check_and_update_password(user, password)
+    if not update_result['success']:
+        flash(update_result['error_info'])
+    return redirect(url_for('auth.user_manage'))
