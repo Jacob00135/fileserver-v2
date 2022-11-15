@@ -196,7 +196,7 @@
 {% block content %}
 <h1 class="text-white text-center my-4">用户管理</h1>
 <div class="row">
-    <div class="col">
+    <div class="col px-0">
 
         <!-- 按钮组 [start] -->
         <div>
@@ -218,7 +218,7 @@
 
             <!-- 每一个用户行 [start] -->
             {% for user in users %}
-                <li class="list-group-item bg-secondary d-flex justify-content-between" data-active="0"
+                <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4" data-active="0"
                     data-event="{{ loop.index0 }}">
 
                     <!-- 多选复选框 -->

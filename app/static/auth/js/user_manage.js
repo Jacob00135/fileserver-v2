@@ -106,18 +106,6 @@
 
             (new bootstrap.Modal(modal, {keyboard: false})).show();
         });
-        // form.addEventListener('submit', (e) => {
-        //     e.preventDefault();
-        //
-        //     const userNameArr = form.querySelectorAll('input[name="user-name"]');
-        //
-        //     for (let i = 0; i < userNameArr.length; i++) {
-        //         if (userNameArr[i].checked) {
-        //             form.submit();
-        //             return undefined;
-        //         }
-        //     }
-        // });
     })();
 
     // 修改用户的密码
