@@ -64,6 +64,12 @@ class ErrorInfo(object):
     USER_PASSWORD_ILLEGAL = '密码不合法：只能是数字字母和@()_-，且长度是6~16'
     USER_PASSWORD_SAME = '不能与原密码一样！'
 
+    # 可见目录管理相关
+    VISIBLE_DIR_NOT_EXISTS = '目录路径不存在！'
+    VISIBLE_DIR_ABSPATH = '可见目录路径必须是绝对路径！'
+    VISIBLE_DIR_ISDIR = '目标路径不是目录！'
+    VISIBLE_DIR_EXISTS = '可见目录已存在！'
+
 
 class UserNameError(object):
     ILLEGAL_CHAR = Config.USER_NAME_ILLEGAL_CHAR
@@ -75,6 +81,12 @@ class UserPasswordError(object):
     ILLEGAL_CHAR = Config.USER_PASSWORD_ILLEGAL_CHAR
     NULL_ERROR = ErrorInfo.USER_PASSWORD_NULL
     ILLEGAL_ERROR = ErrorInfo.USER_PASSWORD_ILLEGAL
+
+
+class Permission(object):
+    ANONYMOUS_USER = 1
+    USER = 3
+    ADMIN = 7
 
 
 config = {

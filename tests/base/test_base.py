@@ -79,9 +79,9 @@ class BaseTestCase(BaseUnittestCase):
         self.assertTrue(os.path.exists(TestingConfig.DATABASE_PATH))
 
     def test_user_table_exists(self):
-        """检查数据库users表是否会自动生成"""
+        """检查数据库的users表是否会自动生成"""
         result = self.cursor.execute(
-            'SELECT COUNT(*) FROM sqlite_master WHERE `type`="table" AND `name`="users";'
+            'SELECT COUNT(*) FROM `sqlite_master` WHERE `type`="table" AND `name`="users";'
         ).fetchone()
         self.assertTrue(result[0] == 1)
 
@@ -101,3 +101,10 @@ class BaseTestCase(BaseUnittestCase):
         # response = self.client.get(self.url_for('auth.logout'), follow_redirects=True)
         # self.assertTrue(response.status_code == 404)
         pass
+
+    def test_visible_dir_table_exists(self):
+        """检查数据库的visible_dir表是否会自动生成"""
+        result = self.cursor.execute(
+            'SELECT COUNT(*) FROM `sqlite_master` WHERE `type`="table" AND `name`="visible_dir"'
+        ).fetchone()
+        self.assertTrue(result[0] == 1)

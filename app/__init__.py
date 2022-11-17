@@ -34,6 +34,14 @@ def init_database(config_class):
         )
         con.commit()
 
+    # 建表：visible_dir
+    cursor.execute("""CREATE TABLE IF NOT EXISTS `visible_dir`(
+        `dir_id` INTEGER PRIMARY KEY AUTOINCREMENT,
+        `dir_path` TEXT NOT NULL UNIQUE,
+        `dir_permission` INT NOT NULL
+    );""")
+    con.commit()
+
     # 关闭连接
     cursor.close()
     con.close()

@@ -1,9 +1,10 @@
+import os
 from flask import Blueprint, request, flash, redirect, jsonify, url_for, render_template
 from flask_login import login_user, login_required, current_user, logout_user
 from config import ErrorInfo
 from app import db
-from app.model import Users
-from app.untils import check_legal, check_and_update_password, admin_required
+from app.model import Users, VisibleDir
+from app.untils import check_legal, check_and_update_password, admin_required, check_dir_path
 
 auth = Blueprint('auth', __name__)
 
@@ -148,3 +149,74 @@ def update_user_password():
     if not update_result['success']:
         flash(update_result['error_info'])
     return redirect(url_for('auth.user_manage'))
+
+
+@auth.route('/visible_dir_manage')
+@admin_required
+def visible_dir_manage():
+    # 查询所有可见目录，并根据访问权限进行分类
+    visible_dir_list: list[VisibleDir] = VisibleDir.query.all()
+    visible_dir_dict = {
+        'anonymous_user': [],
+        'user': [],
+        'admin': []
+    }
+    for visible_dir in visible_dir_list:
+        user_classes = visible_dir.permission
+        visible_dir_dict[user_classes].append(visible_dir)
+
+    return render_template('auth/visible_dir.html', visible_dir_dict=visible_dir_dict)
+
+
+@auth.route('/add_visible_dir', methods=['POST'])
+@admin_required
+def add_visible_dir():
+    # 检查可见目录路径
+    dir_path = request.form.get('dir-path', '')
+    check_result = check_dir_path(dir_path)
+    if not check_result['legal']:
+        flash(check_result['error_info'])
+        return redirect(url_for('auth.visible_dir_manage'))
+
+    # 检查可见目录是否已存在
+    dir_path = os.path.realpath(dir_path)
+    if VisibleDir.query.filter_by(dir_path=dir_path).first() is not None:
+        flash(ErrorInfo.VISIBLE_DIR_EXISTS)
+        return redirect(url_for('auth.visible_dir_manage'))
+
+    # 检查权限值
+    visible_dir = VisibleDir(dir_path=dir_path)
+    try:
+        visible_dir.permission = request.form.get('permission', '')
+    except ValueError as e:
+        flash(e.args[0])
+        return redirect(url_for('auth.visible_dir_manage'))
+
+    # 检查通过，添加到数据库
+    db.session.add(visible_dir)
+    db.session.commit()
+
+    return redirect(url_for('auth.visible_dir_manage'))
+
+
+@auth.route('/delete_visible_dir', methods=['POST'])
+@admin_required
+def delete_visible_dir():
+    # 需要考虑批量删除的情况：只要有1个不合法，就全都不删除
+    delete_visible_dir_list = []
+    for dir_path in request.form.getlist('dir-path'):
+        # 检查可见目录是否存在
+        visible_dir = VisibleDir.query.filter_by(dir_path=dir_path).first()
+        if visible_dir is None:
+            flash(ErrorInfo.VISIBLE_DIR_NOT_EXISTS)
+            return redirect(url_for('auth.visible_dir_manage'))
+
+        # 检查通过，加入待删除列表
+        delete_visible_dir_list.append(visible_dir)
+
+    # 删除用户
+    for visible_dir in delete_visible_dir_list:
+        db.session.delete(visible_dir)
+        db.session.commit()
+
+    return redirect(url_for('auth.visible_dir_manage'))

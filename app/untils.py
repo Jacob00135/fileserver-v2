@@ -1,3 +1,4 @@
+import os
 import re
 from functools import wraps
 from flask import abort
@@ -63,3 +64,15 @@ def admin_required(func):
             abort(403)
         return func(*args, **kwargs)
     return decorator
+
+
+def check_dir_path(dir_path: str) -> dict:
+    """检查一个可见目录路径是否合法"""
+    if (dir_path.find('/') == -1 and dir_path.find('\\') == -1) or not os.path.isabs(dir_path):
+        return {'legal': False, 'error_info': ErrorInfo.VISIBLE_DIR_ABSPATH}
+    dir_path = os.path.abspath(dir_path)
+    if not os.path.exists(dir_path):
+        return {'legal': False, 'error_info': ErrorInfo.VISIBLE_DIR_NOT_EXISTS}
+    if not os.path.isdir(dir_path):
+        return {'legal': False, 'error_info': ErrorInfo.VISIBLE_DIR_ISDIR}
+    return {'legal': True, 'error_info': ''}

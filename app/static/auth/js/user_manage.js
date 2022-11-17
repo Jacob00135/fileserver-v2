@@ -7,7 +7,7 @@
             let index = e.target.getAttribute('data-event');
             if (index === null) return undefined;
 
-            // 选中/取消选中一个用户
+            // 选中/取消选中一个项目
             index = parseInt(index);
             const li = ul.children[index];
             if (li.getAttribute('data-active') === '1') {
@@ -76,7 +76,7 @@
         const form = document.forms['delete-multi-user'];
         const userNameList = form.querySelector('.user-name-list');
         document.getElementById('batch-delete').addEventListener('click', (e) => {
-            // 获取已选中的用户名
+            // 获取已选中的项目
             const checkedUserName = [];
             document.querySelectorAll('#app .user-list input[name="user-name"][type="checkbox"]').forEach((input) => {
                 if (input.checked) {

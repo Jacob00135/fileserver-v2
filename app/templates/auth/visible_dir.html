@@ -1,0 +1,255 @@
+{% extends "base/base.html" %}
+
+{% block title %}可见目录管理{% endblock title %}
+
+{% block style %}
+    <link rel="stylesheet" href="/static/auth/css/visible_dir.css"/>
+{% endblock style %}
+
+{% block modal %}
+    <!-- 添加可见目录模态框 [start] -->
+    <div class="modal fade" id="add-visible-dir-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">添加可见目录</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 添加可见目录表单 [start] -->
+                    <form action="{{ url_for('auth.add_visible_dir') }}" method="post" name="add-visible-dir">
+
+                        <!-- 可见目录路径 [start] -->
+                        <div class="mb-3">
+                            <label for="dir-path" class="form-label">可见目录路径</label>
+                            <input type="text" class="form-control dark-mode-input" id="dir-path"
+                                   name="dir-path" required autocomplete="off"/>
+                        </div>
+                        <!-- 可见目录路径 [end] -->
+
+                        <!-- 访问权限 [start] -->
+                        <input type="text" class="d-none" name="permission" value="javascript" required/>
+                        <!-- 访问权限 [end] -->
+
+                        <!-- 提交按钮 [start] -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-dark px-5 py-2">提交</button>
+                        </div>
+                        <!-- 提交按钮 [end] -->
+
+                    </form>
+                    <!-- 添加可见目录表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 添加可见目录模态框 [end] -->
+
+    <!-- 删除单个可见目录模态框 [start] -->
+    <div class="modal fade" id="delete-visible-dir-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">警告</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 删除单个可见目录表单 [start] -->
+                    <form action="{{ url_for('auth.delete_visible_dir') }}" method="post" name="delete-visible-dir">
+
+                        确定要删除可见目录<span class="bg-danger bg-opacity-75 px-1 rounded-1 dir-path"></span>吗？
+
+                        <input type="text" class="d-none" name="dir-path" value="javascript" required/>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger gray-shadow me-4">删除</button>
+                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                    <!-- 删除单个可见目录表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 删除单个可见目录模态框 [end] -->
+
+    <!-- 删除多个可见目录模态框 [start] -->
+    <div class="modal fade" id="delete-multi-visible-dir-modal" tabindex="-1" aria-hidden="true"
+         data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">警告</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 删除多个可见目录表单 [start] -->
+                    <form action="{{ url_for('auth.delete_visible_dir') }}" method="post"
+                          name="delete-multi-visible-dir">
+
+                        确定要删除以下可见目录吗？
+
+                        <div class="visible-dir-list">
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger gray-shadow me-4">删除</button>
+                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                    <!-- 删除多个可见目录表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 删除多个可见目录模态框 [end] -->
+{% endblock modal %}
+
+{% block content %}
+<h1 class="text-white text-center my-4">可见目录管理</h1>
+<div class="row">
+    <div class="col px-0">
+
+        <!-- 导航头部 [start] -->
+        <ul class="nav nav-pills nav-fill mb-3 px-2" id="visible-dir-nav" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-light active" id="anonymous_user-tab" data-bs-toggle="pill"
+                        data-bs-target="#anonymous_user" type="button" role="tab" aria-controls="anonymous_user"
+                        aria-selected="true">
+                    游客
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-light" id="user-tab" data-bs-toggle="pill" data-bs-target="#user"
+                        type="button" role="tab" aria-controls="user" aria-selected="false">
+                    普通用户
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-light" id="admin-tab" data-bs-toggle="pill" data-bs-target="#admin"
+                        type="button" role="tab" aria-controls="admin" aria-selected="false">
+                    管理员
+                </button>
+            </li>
+        </ul>
+        <!-- 导航头部 [end] -->
+
+        <!-- 可见目录列表 [start] -->
+        <div class="tab-content" id="visible-dir-body">
+
+            {% for user_classes, visible_dir_list in visible_dir_dict.items() %}
+                <div class="tab-pane fade {% if user_classes == 'anonymous_user' %}show active{% endif %}"
+                     id="{{ user_classes }}" role="tabpanel" aria-labelledby="{{ user_classes }}-tab">
+
+                    <!-- 按钮组 [start] -->
+                    <div>
+                        <div class="btn-group d-flex action-group" role="group">
+                            <button type="button" class="btn btn-info gray-shadow" id="{{ user_classes }}-all-select">
+                                全选
+                            </button>
+                            <button type="button" class="btn btn-info gray-shadow" id="{{ user_classes }}-no-select">
+                                全不选
+                            </button>
+                            <button type="button" class="btn btn-info gray-shadow" id="{{ user_classes }}-anti-select">
+                                反选
+                            </button>
+                        </div>
+                        <div class="btn-group d-flex action-group" role="group">
+                            <button type="button" class="btn btn-primary gray-shadow"
+                                    id="{{ user_classes }}-add-visible-dir" data-permission="{{ user_classes }}">
+                                添加目录
+                            </button>
+                            <button type="button" class="btn btn-danger gray-shadow"
+                                    id="{{ user_classes }}-batch-delete">
+                                批量删除
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 按钮组 [end] -->
+
+                    <!-- 列表组 [start] -->
+                    <ul class="list-group mb-5 shadow visible-dir-list">
+                        {% for visible_dir in visible_dir_list %}
+                            <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4"
+                                data-active="0" data-event="{{ loop.index0 }}">
+
+                                <!-- 多选复选框 -->
+                                <input class="form-check-input mt-0 me-2 text-truncate align-self-center"
+                                       type="checkbox" name="dir-path" value="{{ visible_dir.dir_path }}"
+                                       data-event="{{ loop.index0 }}"/>
+
+                                <!-- 显示可见目录的区域 -->
+                                <span class="text-light text-truncate flex-fill dir-path"
+                                      data-event="{{ loop.index0 }}">{{ visible_dir.dir_path }}</span>
+
+                                <!-- 操作按钮 [start] -->
+                                <div class="action d-flex">
+
+                                    <!-- 删除按钮 -->
+                                    <button type="button" class="btn btn-danger btn-sm gray-shadow delete" title="删除"
+                                            data-dir-path="{{ visible_dir.dir_path }}">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
+
+                                </div>
+                                <!-- 操作按钮 [end] -->
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <!-- 列表组 [end] -->
+
+                    <!-- 当没有可见目录时要显示的内容 [start] -->
+                    {% if not visible_dir_list %}
+                        <p class="text-light text-center fs-5 my-5">没有可见目录</p>
+                    {% endif %}
+                    <!-- 当没有可见目录时要显示的内容 [end] -->
+
+                </div>
+            {% endfor %}
+
+        </div>
+        <!-- 可见目录列表 [end] -->
+
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+    <script src="/static/auth/js/visible_dir.js"></script>
+{% endblock javascript %}

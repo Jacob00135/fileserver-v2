@@ -1,6 +1,6 @@
 import os
 from app import create_app, db
-from app.model import Users
+from app.model import Users, AnonymousUser, VisibleDir
 
 # 创建应用
 config_name = os.environ.get('FLASK_CONFIG') or 'default'
@@ -11,7 +11,9 @@ app = create_app(config_name)
 def make_shell_context():
     return dict(
         db=db,
-        Users=Users
+        Users=Users,
+        AnonymousUser=AnonymousUser,
+        VisibleDir=VisibleDir
     )
 
 

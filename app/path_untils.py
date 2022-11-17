@@ -29,7 +29,7 @@ class Path(object):
     def __init__(self, path: str):
         if not is_legal_path(path):
             raise ValueError('路径不合法：{}'.format(path))
-        self.path = os.path.abspath(path)
+        self.path = os.path.realpath(path)
 
     def __repr__(self):
         return '<{} "{}">'.format(self.__class__.__name__, self.path)

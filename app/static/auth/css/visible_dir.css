@@ -6,14 +6,14 @@
 #app .action-group .btn {
   border-radius: 0;
 }
-#app .action-group #all-select {
+#app .action-group [id$=-all-select] {
   border-top-left-radius: 0.25rem;
 }
-#app .action-group #anti-select {
+#app .action-group [id$=-anti-select] {
   border-top-right-radius: 0.25rem;
 }
-#app .action-group #no-select,
-#app .action-group #anti-select {
+#app .action-group [id$=-no-select],
+#app .action-group [id$=-anti-select] {
   border-left-color: #6c757d;
 }
 #app .action-group > .btn-info:hover {
@@ -21,21 +21,21 @@
   background-color: #0d6efd;
 }
 
-#app .user-list > .list-group-item {
+#app .visible-dir-list .list-group-item {
   cursor: pointer;
 }
-#app .user-list > .list-group-item:first-child {
+#app .visible-dir-list .list-group-item:first-child {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-#app .user-list > .list-group-item[data-active="1"] {
+#app .visible-dir-list .list-group-item[data-active="1"] {
   background-color: #212529 !important;
 }
-#app .user-list > .list-group-item input[name=user-name][type=checkbox] {
+#app .visible-dir-list .list-group-item input[name=dir-path][type=checkbox] {
   cursor: pointer;
 }
-#app .user-list > .list-group-item .user-name {
+#app .visible-dir-list .list-group-item .dir-path {
   line-height: 31px;
 }
 
-/*# sourceMappingURL=user_manage.css.map */
+/*# sourceMappingURL=visible_dir.css.map */

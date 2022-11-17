@@ -230,10 +230,14 @@
                         <!-- 下拉菜单条目 [start] -->
                         <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbar-admin-dropdown">
                             <li>
-                                <a class="dropdown-item visible-dir" href="javascript:;">可见目录</a>
+                                <a class="dropdown-item visible-dir" href="{{ url_for('auth.visible_dir_manage') }}">
+                                    可见目录
+                                </a>
                             </li>
                             <li>
-                                <a class="dropdown-item user-manage" href="{{ url_for('auth.user_manage') }}">用户管理</a>
+                                <a class="dropdown-item user-manage" href="{{ url_for('auth.user_manage') }}">
+                                    用户管理
+                                </a>
                             </li>
                         </ul>
                         <!-- 下拉菜单条目 [end] -->

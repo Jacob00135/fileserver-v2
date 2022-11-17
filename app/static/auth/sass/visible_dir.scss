@@ -1,23 +1,22 @@
 @import "../../_variable.scss";
 
 #app .action-group {
-
     /* border-radius */
     .btn {
         border-radius: 0;
     }
 
-    #all-select {
+    [id$="-all-select"] {
         border-top-left-radius: .25rem;
     }
 
-    #anti-select {
+    [id$="-anti-select"] {
         border-top-right-radius: .25rem;
     }
 
     /* border */
-    #no-select,
-    #anti-select {
+    [id$="-no-select"],
+    [id$="-anti-select"] {
         border-left-color: $bg-secondary;
     }
 
@@ -28,7 +27,7 @@
     }
 }
 
-#app .user-list > .list-group-item {
+#app .visible-dir-list .list-group-item {
     cursor: pointer;
 
     &:first-child {
@@ -40,11 +39,11 @@
         background-color: $bg-dark !important;
     }
 
-    input[name="user-name"][type="checkbox"] {
+    input[name="dir-path"][type="checkbox"] {
         cursor: pointer;
     }
 
-    .user-name {
+    .dir-path {
         line-height: 31px;
     }
 }
