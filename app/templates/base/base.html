@@ -20,6 +20,18 @@
 </head>
 <body>
 
+    {# 全局变量：文件类型与图标类映射表 [start] #}
+    {% set file_type_icon_map = {
+        'dir': 'bi bi-folder2',
+        'package': 'bi bi-file-zip',
+        'video': 'bi bi-camera-video',
+        'image': 'bi bi-image',
+        'audio': 'bi bi-music-note-beamed',
+        'text': 'bi bi-file-text',
+        'unknown': 'bi bi-question-square'
+    } %}
+    {# 全局变量：文件类型与图标类映射表 [end] #}
+
     <!-- 代替alert的提示模态框 [start] -->
     <div class="modal fade" id="hint-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
          data-bs-keyboard="false">

@@ -1,5 +1,9 @@
 $bg-dark: #212529;
 $bg-dark-text-color: #ffffffbf;
 $bg-primary: #0d6efd;
-$bg-secondary: #6c757d;
+$bg-secondary: #a5acba;
 $text-light: #F8F9FA;
+
+/* 文件图标颜色相关的变量 */
+$file-type: ["dir", "package", "video", "image", "audio", "text", "unknown"];
+$icon-color: [#ffdc78, #000, #70c3ff, #c4fff1, #f6801f, #aedfd0, $text-light];

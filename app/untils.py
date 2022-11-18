@@ -1,5 +1,6 @@
 import os
 import re
+from collections import OrderedDict
 from functools import wraps
 from flask import abort
 from flask_login import current_user
@@ -118,3 +119,34 @@ def get_upper_path(p: MountPath or DirPath, permission: str):
     if temp_p is not None:
         return p.father_path
     return ''
+
+
+def sort_file_list(files: list) -> list:
+    """按照类型对文件列表中的文件进行排序"""
+    # 创建有序字典，并将文件列表中的所有文件添加至字典中
+    file_map = OrderedDict({
+        'dir': [],
+        'package': [],
+        'video': [],
+        'image': [],
+        'audio': [],
+        'text': [],
+        'unknown': []
+    })
+    while files:
+        file = files.pop(0)
+        file_map[file.type].append(file)
+
+    # 此时文件已按照类型进行排序，之后需要将有序字典转换成列表
+    result = []
+    while file_map:
+        result.extend(file_map.popitem(False)[1])
+    return result
+
+
+def get_nav_path(p: MountPath or DirPath) -> list:
+    result = []
+    while p is not None:
+        result.append((p.name, p.path))
+        p = p.father
+    return result

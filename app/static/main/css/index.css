@@ -1,5 +1,33 @@
-#app .file-list .file-name:hover {
-  text-decoration: underline !important;
+@charset "UTF-8";
+/* 文件图标颜色相关的变量 */
+#app .dir-path-nav .breadcrumb-item.active,
+#app .dir-path-nav .dir-path-link:hover {
+  color: #A5ACBA !important;
+}
+
+#app .file-list .list-group-item:hover {
+  background-color: #212529 !important;
+}
+#app .file-list .bi[data-file-type=dir] {
+  color: #ffdc78 !important;
+}
+#app .file-list .bi[data-file-type=package] {
+  color: #000 !important;
+}
+#app .file-list .bi[data-file-type=video] {
+  color: #70c3ff !important;
+}
+#app .file-list .bi[data-file-type=image] {
+  color: #c4fff1 !important;
+}
+#app .file-list .bi[data-file-type=audio] {
+  color: #f6801f !important;
+}
+#app .file-list .bi[data-file-type=text] {
+  color: #aedfd0 !important;
+}
+#app .file-list .bi[data-file-type=unknown] {
+  color: #F8F9FA !important;
 }
 
 /*# sourceMappingURL=index.css.map */

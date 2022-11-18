@@ -1,4 +1,5 @@
 @charset "UTF-8";
+/* 文件图标颜色相关的变量 */
 /* 工具类 [start] */
 /* 取消container的左右padding */
 .mx-n3 {
@@ -56,5 +57,7 @@ body {
 }
 
 /* 模态框共用样式 [end] */
+/* 文件图标颜色 [start] */
+/* 文件图标颜色 [end] */
 
 /*# sourceMappingURL=base.css.map */

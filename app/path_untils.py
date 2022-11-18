@@ -48,7 +48,7 @@ class MountPath(Path):
         self.__children = None
 
         # 用于统一获取属性
-        self.name = self.dirname
+        self.name = self.dirname[:-1]
 
     @staticmethod
     def is_upper():

@@ -14,13 +14,40 @@
 <div class="row">
     <div class="col px-0">
 
+        <!-- 路径导航 [start] -->
+        {% if not root_page %}
+        <nav class="px-2 px-sm-4 dir-path-nav" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                {# 从最后一个遍历到第一个 [start] #}
+                {% with %}
+                    {% set nav_path_length = nav_path | length %}
+                    {% for i in range(nav_path_length - 1) %}
+                        {% set name, path = nav_path[nav_path_length - i - 1] %}
+                        <li class="breadcrumb-item">
+                            <a class="text-light dir-path-link"
+                               href="{{ url_for('main.index', path=path) }}">{{ name }}</a>
+                        </li>
+                    {% endfor %}
+                {% endwith %}
+                {# 从最后一个遍历到第一个 [end] #}
+
+                <!-- 当前页面 -->
+                <li class="breadcrumb-item active" aria-current="page">
+                    {{ nav_path[0][0] }}
+                </li>
+
+            </ol>
+        </nav>
+        {% endif %}
+        <!-- 路径导航 [end] -->
+
         <!-- 文件列表 [start] -->
         <ul class="list-group mb-5 shadow file-list">
 
             <!-- 上一级 [start] -->
             {% if not root_page %}
-                <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4 upper-path">
-                    <a class="text-light text-truncate flex-fill text-decoration-none file-name"
+                <li class="list-group-item bg-secondary d-flex justify-content-between p-0 upper-path">
+                    <a class="text-light text-truncate flex-fill text-decoration-none px-2 px-sm-4 py-2 file-name"
                        href="{{ url_for('main.index', path=upper_path) }}">
                         上一级
                     </a>
@@ -30,10 +57,18 @@
 
             <!-- 每一个用户行 [start] -->
             {% for file in file_list %}
-                <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4">
+                <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4 py-0">
+
+                    <!-- 多选复选框 -->
+                    <input class="form-check-input mt-0 me-2 text-truncate align-self-center d-none" type="checkbox"
+                           name="file-name" value="{{ file.path }}"/>
+
+                    <!-- 文件类型图标 -->
+                    <i class="{{ file_type_icon_map[file.type] }} mt-0 me-2 align-self-center fs-3 text-light"
+                       data-file-type="{{ file.type }}"></i>
 
                     <!-- 显示文件名的区域 -->
-                    <a class="text-light text-truncate flex-fill text-decoration-none file-name"
+                    <a class="text-light text-truncate flex-fill text-decoration-none py-2 file-name"
                        href="{{ url_for('main.index', path=file.path) }}"
                        {% if file.type != 'dir' %}target="_blank"{% endif %}>
                         {% if root_page %}

@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, render_template, request, abort, send_from_directory
 from flask_login import current_user
 from app.model import VisibleDir
-from app.untils import match_visible_dir, get_upper_path
+from app.untils import match_visible_dir, get_upper_path, sort_file_list, get_nav_path
 from app.path_untils import MountPath, DirPath, create_path_object
 
 main = Blueprint('main', __name__)
@@ -50,9 +50,10 @@ def index():
     upper_path = get_upper_path(p, current_user.permission)
     return render_template(
         'main/index.html',
-        file_list=p.children,  # 要展示的文件列表
+        file_list=sort_file_list(p.children),  # 要展示的文件列表
         root_page=False,  # 是否是根页面
-        upper_path=upper_path  # 上一级路径
+        upper_path=upper_path,  # 上一级路径
+        nav_path=get_nav_path(p)  # 面包屑导航路径
     )
 
 

@@ -1,5 +1,24 @@
+@import "../../_variable.scss";
+
+#app .dir-path-nav {
+
+    .breadcrumb-item.active,
+    .dir-path-link:hover {
+        color: #A5ACBA !important;
+    }
+}
+
 #app .file-list {
-    .file-name:hover {
-        text-decoration: underline !important;
+    .list-group-item:hover {
+        background-color: $bg-dark !important;
+    }
+
+    @for $i from 1 through 7 {
+        $t: nth($file-type, $i);
+        $c: nth($icon-color, $i);
+
+        .bi[data-file-type="#{$t}"] {
+            color: $c !important;
+        }
     }
 }
