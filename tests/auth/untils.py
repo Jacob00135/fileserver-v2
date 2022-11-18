@@ -31,7 +31,7 @@ def generate_user(generate_num: int) -> None:
 
 def generate_visible_dir():
     """生成可见目录"""
-    db.session.add_all([
+    visible_dir_list = [
         VisibleDir(
             dir_path=BASE_PATH,
             permission='admin',
@@ -68,7 +68,16 @@ def generate_visible_dir():
             dir_path=os.path.join(BASE_PATH, 'app'),
             permission='admin'
         )
-    ])
+    ]
+    for visible_dir in visible_dir_list:
+        if VisibleDir.query.filter_by(dir_path=visible_dir.dir_path).first() is None:
+            db.session.add(visible_dir)
+    db.session.commit()
+
+
+def delete_all_visible_dir():
+    for visible_dir in VisibleDir.query.all():
+        db.session.delete(visible_dir)
     db.session.commit()
 
 

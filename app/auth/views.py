@@ -23,17 +23,17 @@ def login():
         })
 
     # 获取发送登录请求时所在的页面路由
-    current_url = request.form.get('current-url', '/')
+    current_url = request.form.get('current-url', '/', type=str)
 
     # 检查用户名
-    user_name = request.form.get('user-name')
+    user_name = request.form.get('user-name', '', type=str)
     user: Users = Users.query.filter_by(user_name=user_name).first()
     if user_name is None or user is None:
         flash(ErrorInfo.USER_NOT_EXISTS)
         return redirect(current_url)
 
     # 检查密码
-    user_password = request.form.get('user-password')
+    user_password = request.form.get('user-password', '', type=str)
     if user_password is None or not user.verify_password(user_password):
         flash(ErrorInfo.USER_PASSWORD_WRONG)
         return redirect(current_url)
@@ -55,10 +55,10 @@ def logout():
 @login_required
 def update_password():
     # 获取发送登录请求时所在的页面路由
-    current_url = request.form.get('current-url', '/')
+    current_url = request.form.get('current-url', '/', type=str)
 
     # 修改密码
-    password = request.form.get('new-password', '')
+    password = request.form.get('new-password', '', type=str)
     update_result = check_and_update_password(current_user, password)
     if not update_result['success']:
         flash(update_result['error_info'])
@@ -84,7 +84,7 @@ def user_manage():
 @admin_required
 def add_user():
     # 检查用户名
-    user_name = request.form.get('user-name', '')
+    user_name = request.form.get('user-name', '', type=str)
     check_result = check_legal(user_name, 'user_name')
     if not check_result['legal']:
         flash(check_result['error_info'])
@@ -96,7 +96,7 @@ def add_user():
         return redirect(url_for('auth.user_manage'))
 
     # 检查密码
-    user_password = request.form.get('user-password', '')
+    user_password = request.form.get('user-password', '', type=str)
     check_result = check_legal(user_password, 'user_password')
     if not check_result['legal']:
         flash(check_result['error_info'])
@@ -137,14 +137,14 @@ def delete_user():
 @admin_required
 def update_user_password():
     # 检查用户是否存在
-    user_name = request.form.get('user-name', '')
+    user_name = request.form.get('user-name', '', type=str)
     user = Users.query.filter_by(user_name=user_name).first()
     if user is None:
         flash(ErrorInfo.USER_NOT_EXISTS)
         return redirect(url_for('auth.user_manage'))
 
     # 检查密码
-    password = request.form.get('new-password', '')
+    password = request.form.get('new-password', '', type=str)
     update_result = check_and_update_password(user, password)
     if not update_result['success']:
         flash(update_result['error_info'])
@@ -172,7 +172,7 @@ def visible_dir_manage():
 @admin_required
 def add_visible_dir():
     # 检查可见目录路径
-    dir_path = request.form.get('dir-path', '')
+    dir_path = request.form.get('dir-path', '', type=str)
     check_result = check_dir_path(dir_path)
     if not check_result['legal']:
         flash(check_result['error_info'])
@@ -187,7 +187,7 @@ def add_visible_dir():
     # 检查权限值
     visible_dir = VisibleDir(dir_path=dir_path)
     try:
-        visible_dir.permission = request.form.get('permission', '')
+        visible_dir.permission = request.form.get('permission', '', type=str)
     except ValueError as e:
         flash(e.args[0])
         return redirect(url_for('auth.visible_dir_manage'))

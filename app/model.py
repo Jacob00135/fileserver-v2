@@ -1,8 +1,8 @@
+import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import AnonymousUserMixin
 from config import Permission
 from app import db, login_manager
-from app.path_untils import DirPath
 
 
 class Users(db.Model):
@@ -84,10 +84,7 @@ class VisibleDir(db.Model):
     def __init__(self, **kwargs):
         super(VisibleDir, self).__init__(**kwargs)
 
-        # 携带DirPath对象
-        self.p: DirPath = DirPath(self.dir_path)
-
-        self.dir_path = self.p.path
+        self.dir_path = os.path.realpath(self.dir_path)
 
     def __repr__(self):
         return '<VisibleDir "{}">'.format(self.dir_path)

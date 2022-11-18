@@ -39,12 +39,16 @@ class MountPath(Path):
 
     def __init__(self, path: str):
         super(MountPath, self).__init__(path)
-        self.path = self.path.upper()
         self.dirname = self.path
         self.type = 'dir'
         self.size = ''
 
+        self.father_path = None
+        self.father = None
         self.__children = None
+
+        # 用于统一获取属性
+        self.name = self.dirname
 
     @staticmethod
     def is_upper():
@@ -79,6 +83,9 @@ class DirPath(Path):
         self.mount = MountPath(self.mount_path)
 
         self.__children = None
+
+        # 用于统一获取属性
+        self.name = self.dirname
 
     @property
     def father(self):
@@ -195,6 +202,9 @@ class FilePath(Path):
         self.mount_path = self.path[:self.path.find(':') + 2]
         self.mount = MountPath(self.mount_path)
 
+        # 用于统一获取属性
+        self.name = self.full_filename
+
     def __set_extension(self) -> None:
         i = self.full_filename.rfind('.')
         if i == -1:
@@ -243,6 +253,17 @@ def get_children(path: str) -> list[DirPath or FilePath]:
         else:
             raise TypeError('既不是目录也不是文件：{}'.format(child_path))
     return children
+
+
+def create_path_object(visible_dir_list: list) -> list:
+    object_list = []
+    for visible_dir in visible_dir_list:
+        if os.path.ismount(visible_dir.dir_path):
+            obj = MountPath(visible_dir.dir_path)
+        else:
+            obj = DirPath(visible_dir.dir_path)
+        object_list.append(obj)
+    return object_list
 
 
 if __name__ == '__main__':

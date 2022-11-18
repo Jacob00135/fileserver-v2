@@ -5,7 +5,8 @@ from flask import abort
 from flask_login import current_user
 from config import ErrorInfo, UserNameError, UserPasswordError
 from app import db
-from app.model import Users
+from app.model import Users, VisibleDir
+from app.path_untils import MountPath, DirPath
 
 
 def check_legal(string: str, check_type: str) -> dict:
@@ -76,3 +77,44 @@ def check_dir_path(dir_path: str) -> dict:
     if not os.path.isdir(dir_path):
         return {'legal': False, 'error_info': ErrorInfo.VISIBLE_DIR_ISDIR}
     return {'legal': True, 'error_info': ''}
+
+
+def match_visible_dir(path: str, permission: str) -> DirPath or MountPath or None:
+    """使用一个目录的路径匹配数据库中的可见目录"""
+    # 生成路径哈希表
+    visible_dir_list = VisibleDir.query.filter(VisibleDir.dir_permission <= permission).all()
+    path_set = set()
+    for visible_dir in visible_dir_list:
+        path_set.add(visible_dir.dir_path)
+
+    # 匹配：不断用父级目录匹配数据库可见目录
+    if os.path.ismount(path):
+        p = MountPath(path)
+    else:
+        p = DirPath(path)
+    while p is not None and p.path not in path_set:
+        p = p.father
+    if p is None:
+        return None
+    return p
+
+
+def get_upper_path(p: MountPath or DirPath, permission: str):
+    """获取上一级路径"""
+    # 生成路径哈希表
+    visible_dir_list = VisibleDir.query.filter(VisibleDir.dir_permission <= permission).all()
+    path_set = set()
+    for visible_dir in visible_dir_list:
+        path_set.add(visible_dir.dir_path)
+
+    # 当前路径已是磁盘根路径，将会转到根页面
+    if p.father_path is None:
+        return ''
+    
+    # 如果上一级有权限访问，则转到上一级，否则转到根页面
+    temp_p = p.father
+    while temp_p is not None and temp_p.path not in path_set:
+        temp_p = temp_p.father
+    if temp_p is not None:
+        return p.father_path
+    return ''

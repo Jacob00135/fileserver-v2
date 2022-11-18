@@ -6,5 +6,60 @@
     <link rel="stylesheet" href="/static/main/css/index.css" />
 {% endblock style %}
 
+{% block modal %}
+{% endblock modal %}
+
 {% block content %}
+<h1 class="text-white text-center my-4">文件系统</h1>
+<div class="row">
+    <div class="col px-0">
+
+        <!-- 文件列表 [start] -->
+        <ul class="list-group mb-5 shadow file-list">
+
+            <!-- 上一级 [start] -->
+            {% if not root_page %}
+                <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4 upper-path">
+                    <a class="text-light text-truncate flex-fill text-decoration-none file-name"
+                       href="{{ url_for('main.index', path=upper_path) }}">
+                        上一级
+                    </a>
+                </li>
+            {% endif %}
+            <!-- 上一级 [end] -->
+
+            <!-- 每一个用户行 [start] -->
+            {% for file in file_list %}
+                <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4">
+
+                    <!-- 显示文件名的区域 -->
+                    <a class="text-light text-truncate flex-fill text-decoration-none file-name"
+                       href="{{ url_for('main.index', path=file.path) }}"
+                       {% if file.type != 'dir' %}target="_blank"{% endif %}>
+                        {% if root_page %}
+                            {{ file.path }}
+                        {% else %}
+                            {{ file.name }}
+                        {% endif %}
+                    </a>
+
+                </li>
+            {% endfor %}
+            <!-- 每一个用户行 [end] -->
+
+        </ul>
+        <!-- 文件列表 [end] -->
+
+        <!-- 当没有可见目录可显示时要显示的内容 [start] -->
+        {% if not file_list %}
+            <p class="text-light text-center fs-5 my-5">没有文件</p>
+        {% endif %}
+        <!-- 当没有可见目录可显示时要显示的内容 [end] -->
+
+    </div>
+</div>
 {% endblock content %}
+
+{% block javascript %}
+    <script src="/static/main/js/index.js"></script>
+{% endblock javascript %}
