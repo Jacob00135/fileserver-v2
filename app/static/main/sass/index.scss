@@ -2,6 +2,10 @@
 
 #app .dir-path-nav {
 
+    .breadcrumb-item::before {
+        color: $text-light;
+    }
+
     .breadcrumb-item.active,
     .dir-path-link:hover {
         color: #A5ACBA !important;
@@ -19,6 +23,34 @@
 
         .bi[data-file-type="#{$t}"] {
             color: $c !important;
+        }
+    }
+}
+
+#full-file-name-modal {
+
+    .show-file-name {
+        background-color: #ffffffe6;
+        cursor: text;
+    }
+}
+
+#app .file-list .action-dropdown {
+
+    [id^="action-dropdown-btn"] {
+        height: 36px;
+        transition: all .15s;
+
+        &:hover,
+        &:active,
+        &:focus,
+        &.show {
+            background-color: $bg-secondary;
+            color: $text-dark;
+        }
+
+        &::after {
+            margin-left: 0;
         }
     }
 }

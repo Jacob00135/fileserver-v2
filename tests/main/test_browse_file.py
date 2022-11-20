@@ -1,5 +1,4 @@
 import os.path
-
 from config import BASE_PATH
 from app import db
 from app.model import Users, VisibleDir

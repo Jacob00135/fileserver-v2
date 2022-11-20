@@ -1,8 +1,10 @@
 import os
-from flask import Blueprint, render_template, request, abort, send_from_directory
+from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash
 from flask_login import current_user
+from config import ErrorInfo
 from app.model import VisibleDir
-from app.untils import match_visible_dir, get_upper_path, sort_file_list, get_nav_path
+from app.untils import get_upper_path, sort_file_list, get_nav_path, check_path_query_param, admin_required, \
+    check_filename
 from app.path_untils import MountPath, DirPath, create_path_object
 
 main = Blueprint('main', __name__)
@@ -21,20 +23,15 @@ def index():
             root_page=True  # 是否是根页面
         )
 
-    # 检查路径合法性
-    if path.find('\\') == -1 or not os.path.isabs(path) or not os.path.exists(path):
+    # 检查查询参数path是否合法
+    if not check_path_query_param(path):
         abort(404)
     path = os.path.realpath(path)
 
-    # 查询数据库中是否有匹配的可见目录
+    # 响应文件
     dir_path = path
     if not os.path.isdir(path):
         dir_path = os.path.dirname(path)
-    p = match_visible_dir(dir_path, current_user.permission)
-    if p is None:
-        abort(404)
-
-    # 响应文件
     if os.path.isfile(path):
         return send_from_directory(
             directory=dir_path,
@@ -75,3 +72,81 @@ def forbidden(e):
 @main.app_errorhandler(405)
 def method_not_allowed(e):
     return render_template('base/404.html'), 404
+
+
+@main.route('/download')
+def download():
+    # 检查查询参数
+    path = request.args.get('path', '', type=str)
+    if not check_path_query_param(path):
+        abort(404)
+    path = os.path.realpath(path)
+
+    # 响应文件
+    dir_path = path
+    if os.path.isfile(path):
+        dir_path = os.path.dirname(path)
+        return send_from_directory(
+            directory=dir_path,
+            path=os.path.basename(path),
+            as_attachment=True
+        )
+
+    # 响应目录
+    return 'response dir'
+
+
+@main.route('/remove', methods=['POST'])
+@admin_required
+def remove():
+    # 检查参数
+    path = request.form.get('path', '', type=str)
+    if not check_path_query_param(path):
+        abort(404)
+    path = os.path.realpath(path)
+
+    # 删除文件
+    dir_path = path
+    if os.path.isfile(path):
+        dir_path = os.path.dirname(path)
+        os.remove(path)
+        return redirect(url_for('main.index', path=dir_path))
+
+    return 'response dir'
+
+
+@main.route('/rename', methods=['POST'])
+@admin_required
+def rename():
+    # 检查绝对路径
+    path = request.form.get('path', '', type=str)
+    if not check_path_query_param(path):
+        abort(404)
+    path = os.path.realpath(path)
+
+    # 获取文件所在目录及文件名
+    dir_path, filename = os.path.split(path)
+
+    # 检查是否新旧名称相同
+    new_filename = request.form.get('new-file-name', '', type=str)
+    if filename == new_filename:
+        flash(ErrorInfo.RENAME_FILENAME_SAME)
+        return redirect(url_for('main.index', path=dir_path))
+
+    # 检查新名称是否合法
+    if not check_filename(new_filename):
+        flash(ErrorInfo.RENAME_NEW_FILENAME_ILLEGAL)
+        return redirect(url_for('main.index', path=dir_path))
+
+    # 检查同目录下是否已有同名文件
+    new_path = os.path.realpath(os.path.join(dir_path, new_filename))
+    if os.path.exists(new_path):
+        flash(ErrorInfo.RENAME_FILE_EXISTS)
+        return redirect(url_for('main.index', path=dir_path))
+
+    # 重命名文件
+    if os.path.isfile(path):
+        os.rename(path, new_path)
+        return redirect(url_for('main.index', path=dir_path))
+
+    return 'response dir'

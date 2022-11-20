@@ -70,6 +70,11 @@ class ErrorInfo(object):
     VISIBLE_DIR_ISDIR = '目标路径不是目录！'
     VISIBLE_DIR_EXISTS = '可见目录已存在！'
 
+    # 文件重命名
+    RENAME_NEW_FILENAME_ILLEGAL = '文件名不能包含\\/:*?"<>|'
+    RENAME_FILENAME_SAME = '新文件名与原文件名相同'
+    RENAME_FILE_EXISTS = '同目录下已有相同文件名'
+
 
 class UserNameError(object):
     ILLEGAL_CHAR = Config.USER_NAME_ILLEGAL_CHAR

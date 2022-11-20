@@ -80,10 +80,10 @@ def check_dir_path(dir_path: str) -> dict:
     return {'legal': True, 'error_info': ''}
 
 
-def match_visible_dir(path: str, permission: str) -> DirPath or MountPath or None:
+def match_visible_dir(path: str) -> DirPath or MountPath or None:
     """使用一个目录的路径匹配数据库中的可见目录"""
     # 生成路径哈希表
-    visible_dir_list = VisibleDir.query.filter(VisibleDir.dir_permission <= permission).all()
+    visible_dir_list = VisibleDir.query.filter(VisibleDir.dir_permission <= current_user.permission).all()
     path_set = set()
     for visible_dir in visible_dir_list:
         path_set.add(visible_dir.dir_path)
@@ -150,3 +150,31 @@ def get_nav_path(p: MountPath or DirPath) -> list:
         result.append((p.name, p.path))
         p = p.father
     return result
+
+
+def check_path_query_param(path: str) -> bool:
+    """检查查询参数path是否合法"""
+    # 检查路径合法性
+    if path.find('\\') == -1 or not os.path.isabs(path) or not os.path.exists(path):
+        return False
+    path = os.path.realpath(path)
+
+    # 查询数据库中是否有匹配的可见目录
+    dir_path = path
+    if not os.path.isdir(path):
+        dir_path = os.path.dirname(path)
+    p = match_visible_dir(dir_path)
+    if p is None:
+        return False
+    return True
+
+
+def check_filename(filename: str) -> bool:
+    """检查一个文件名是否合法"""
+    if filename == '':
+        return False
+    try:
+        next(re.finditer('[\\\/:*?"<>|]', filename))
+    except StopIteration:
+        return True
+    return False

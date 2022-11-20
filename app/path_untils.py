@@ -2,7 +2,7 @@ import os
 
 
 def connect(path1: str, path2: str, *args) -> str:
-    return os.path.abspath(os.path.join(path1, path2, *args))
+    return os.path.realpath(os.path.join(path1, path2, *args))
 
 
 def get_file_size(file_path: str) -> str:

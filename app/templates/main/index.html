@@ -7,6 +7,140 @@
 {% endblock style %}
 
 {% block modal %}
+    <!-- 完整文件名模态框 [start] -->
+    <div class="modal fade" id="full-file-name-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">完整文件名</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 显示文件名、复制按钮 [start] -->
+                    <div class="d-flex show-panel">
+                        <input type="text" class="form-control show-file-name" readonly>
+                        <button type="button" class="btn btn-dark ms-2 no-shadow copy-btn">
+                            <i class="bi bi-clipboard copy-icon"></i>
+                        </button>
+                    </div>
+                    <!-- 显示文件名、复制按钮 [start] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 完整文件名模态框 [end] -->
+
+    <!-- 删除文件 [start] -->
+    <div class="modal fade" id="delete-file-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">警告</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 删除文件表单 [start] -->
+                    <form action="{{ url_for('main.remove') }}" method="post" name="delete-file">
+
+                        确定要删除文件<span class="bg-danger bg-opacity-75 px-1 rounded-1 file-name"></span>吗？
+
+                        <input type="text" class="d-none" name="path" value="javascript" required/>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger gray-shadow me-4">删除</button>
+                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                    <!-- 删除文件表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 删除文件 [end] -->
+
+    <!-- 重命名文件 [start] -->
+    <div class="modal fade" id="rename-file-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">重命名</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 重命名文件表单 [start] -->
+                    <form action="{{ url_for('main.rename') }}" method="post" name="rename-file">
+
+                        <!-- 隐藏的控件：要重命名的文件的绝对路径 -->
+                        <input type="text" class="d-none" name="path" value="javascript"/>
+
+                        <!-- 原名称 [start] -->
+                        <div class="mb-3">
+                            <label for="rename-source-file-name" class="form-label">原名称</label>
+                            <div class="d-flex show-panel">
+                                <input type="text" class="form-control source-file-name" id="rename-source-file-name"
+                                       readonly/>
+                                <button type="button" class="btn btn-dark ms-2 no-shadow copy-btn">
+                                    <i class="bi bi-clipboard copy-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 原名称 [end] -->
+
+                        <!-- 新名称 [start] -->
+                        <div class="mb-3">
+                            <label for="rename-new-file-name" class="form-label">新名称</label>
+                            <input type="text" class="form-control dark-mode-input" id="rename-new-file-name"
+                                   name="new-file-name" required autocomplete="off"/>
+                        </div>
+                        <!-- 新名称 [end] -->
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger gray-shadow me-4">确定</button>
+                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                    <!-- 重命名文件表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 重命名文件 [end] -->
 {% endblock modal %}
 
 {% block content %}
@@ -69,7 +203,7 @@
 
                     <!-- 显示文件名的区域 -->
                     <a class="text-light text-truncate flex-fill text-decoration-none py-2 file-name"
-                       href="{{ url_for('main.index', path=file.path) }}"
+                       href="{{ url_for('main.index', path=file.path) }}" title="{{ file.name }}"
                        {% if file.type != 'dir' %}target="_blank"{% endif %}>
                         {% if root_page %}
                             {{ file.path }}
@@ -77,6 +211,49 @@
                             {{ file.name }}
                         {% endif %}
                     </a>
+
+                    <!-- 显示文件大小的区域 -->
+                    <span class="text-light py-2 file-size {% if file.size != '' %}ms-2{% endif %}">{{ file.size }}</span>
+
+                    <!-- 操作下拉菜单 [start] -->
+                    <div class="dropdown action-dropdown d-flex">
+
+                        <!-- 折叠、展开按钮 -->
+                        <button class="btn btn-dark dropdown-toggle ms-2 align-self-center no-shadow border border-secondary"
+                                type="button" id="action-dropdown-btn-{{ loop.index0 }}" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                        </button>
+
+                        <!-- 操作按钮列表 [start] -->
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('main.download', path=file.path) }}">下载</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item full-file-name" href="javascript:;"
+                                   data-file-name="{{ file.name }}">查看完整文件名</a>
+                            </li>
+                            {% if current_user.is_admin() %}
+                                <li>
+                                    <a class="dropdown-item" href="javascript:;">复制</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="javascript:;">移动</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item remove" href="javascript:;"
+                                       data-file-path="{{ file.path }}" data-file-name="{{ file.name }}">删除</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rename" href="javascript:;" data-file-path="{{ file.path }}"
+                                       data-file-name="{{ file.name }}">重命名</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                        <!-- 操作按钮列表 [end] -->
+
+                    </div>
+                    <!-- 操作下拉菜单 [end] -->
 
                 </li>
             {% endfor %}
