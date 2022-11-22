@@ -1,4 +1,5 @@
 import os
+import shutil
 from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash
 from flask_login import current_user
 from config import ErrorInfo
@@ -50,6 +51,7 @@ def index():
         file_list=sort_file_list(p.children),  # 要展示的文件列表
         root_page=False,  # 是否是根页面
         upper_path=upper_path,  # 上一级路径
+        current_dir_path=p.path,  # 当前目录绝对路径
         nav_path=get_nav_path(p)  # 面包屑导航路径
     )
 
@@ -109,7 +111,10 @@ def remove():
     dir_path = path
     if os.path.isfile(path):
         dir_path = os.path.dirname(path)
-        os.remove(path)
+        try:
+            os.remove(path)
+        except Exception as e:
+            flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
         return redirect(url_for('main.index', path=dir_path))
 
     return 'response dir'
@@ -146,7 +151,94 @@ def rename():
 
     # 重命名文件
     if os.path.isfile(path):
-        os.rename(path, new_path)
+        try:
+            os.rename(path, new_path)
+        except Exception as e:
+            flash(ErrorInfo.RENAME_UNKNOWN.format(e.args[0]))
         return redirect(url_for('main.index', path=dir_path))
 
     return 'response dir'
+
+
+@main.route('/move', methods=['POST'])
+@admin_required
+def move():
+    # 检查原路径
+    path = request.form.get('source-file-path', '', type=str)
+    if not check_path_query_param(path):
+        abort(404)
+    path = os.path.realpath(path)
+
+    # 获取文件的源目录
+    dir_path = path
+    if os.path.isfile(path):
+        dir_path = os.path.dirname(path)
+
+    # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径、目标路径下是否已有同名文件
+    target_path = request.form.get('target-file-path', '', type=str)
+    if target_path.find('\\') == -1 or not os.path.isabs(target_path):
+        flash(ErrorInfo.MOVE_TARGET_NOT_ISABS)
+        return redirect(url_for('main.index', path=dir_path))
+    if not os.path.exists(target_path):
+        flash(ErrorInfo.MOVE_TARGET_NOT_EXISTS)
+        return redirect(url_for('main.index', path=dir_path))
+    target_path = os.path.realpath(target_path)
+    if not os.path.isdir(target_path):
+        flash(ErrorInfo.MOVE_TARGET_NOT_ISDIR)
+        return redirect(url_for('main.index', path=dir_path))
+    target_file_path = os.path.realpath(os.path.join(target_path, os.path.basename(path)))
+    if os.path.exists(target_file_path):
+        flash(ErrorInfo.MOVE_TARGET_EXISTS_FILE)
+        return redirect(url_for('main.index', path=dir_path))
+
+    # 移动文件
+    if os.path.isfile(path):
+        try:
+            shutil.move(path, target_file_path)
+        except Exception as e:
+            flash(ErrorInfo.MOVE_UNKNOWN.format(e.args[0]))
+        return redirect(url_for('main.index', path=dir_path))
+
+    return 'move dir'
+
+
+@main.route('/copy_file', methods=['POST'])
+@admin_required
+def copy_file():
+    # 检查原路径
+    path = request.form.get('source-file-path', '', type=str)
+    if not check_path_query_param(path):
+        abort(404)
+    path = os.path.realpath(path)
+
+    # 获取文件的源目录
+    dir_path = path
+    if os.path.isfile(path):
+        dir_path = os.path.dirname(path)
+
+    # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径、目标路径下是否已有同名文件
+    target_path = request.form.get('target-file-path', '', type=str)
+    if target_path.find('\\') == -1 or not os.path.isabs(target_path):
+        flash(ErrorInfo.COPY_TARGET_NOT_ISABS)
+        return redirect(url_for('main.index', path=dir_path))
+    if not os.path.exists(target_path):
+        flash(ErrorInfo.COPY_TARGET_NOT_EXISTS)
+        return redirect(url_for('main.index', path=dir_path))
+    target_path = os.path.realpath(target_path)
+    if not os.path.isdir(target_path):
+        flash(ErrorInfo.COPY_TARGET_NOT_ISDIR)
+        return redirect(url_for('main.index', path=dir_path))
+    target_file_path = os.path.realpath(os.path.join(target_path, os.path.basename(path)))
+    if os.path.exists(target_file_path):
+        flash(ErrorInfo.COPY_TARGET_EXISTS_FILE)
+        return redirect(url_for('main.index', path=dir_path))
+
+    # 移动文件
+    if os.path.isfile(path):
+        try:
+            shutil.copy(path, target_file_path)
+        except Exception as e:
+            flash(ErrorInfo.COPY_UNKNOWN.format(e.args[0]))
+        return redirect(url_for('main.index', path=dir_path))
+
+    return 'move dir'

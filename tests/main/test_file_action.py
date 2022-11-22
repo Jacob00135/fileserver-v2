@@ -15,7 +15,8 @@ class FileActionTestCase(BaseUnittestCase):
         generate_visible_dir()
 
         # 生成测试文件
-        self.test_file_path = os.path.realpath(os.path.join(BASE_PATH, 'test_file.txt'))
+        self.test_file_name = 'test_file.txt'
+        self.test_file_path = os.path.realpath(os.path.join(BASE_PATH, self.test_file_name))
         with open(self.test_file_path, 'wb') as file:
             file.write(b'')
             file.close()
@@ -134,3 +135,103 @@ class FileActionTestCase(BaseUnittestCase):
         new_path = os.path.realpath(os.path.join(os.path.dirname(self.test_file_path), new_filename))
         self.assertTrue(os.path.exists(new_path))
         os.remove(new_path)
+
+    def test_move_file_forbidden(self):
+        """移动文件失败：无权限"""
+        # 匿名用户请求
+        target_path = os.path.realpath(os.path.join(BASE_PATH, 'admin_dir'))
+        target_file_path = os.path.realpath(os.path.join(target_path, self.test_file_name))
+        response = self.client.post(
+            self.url_for('main.move'),
+            data={
+                'source-file-path': self.test_file_path,
+                'target-file-path': target_path
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 404)
+        self.assertTrue(os.path.exists(self.test_file_path))
+        self.assertFalse(os.path.exists(target_file_path))
+
+        # 普通用户请求
+        self.login(self.user.user_name, '123456')
+        response = self.client.post(
+            self.url_for('main.move'),
+            data={
+                'source-file-path': self.test_file_path,
+                'target-file-path': target_path
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 404)
+        self.assertTrue(os.path.exists(self.test_file_path))
+        self.assertFalse(os.path.exists(target_file_path))
+
+    def test_move_file(self):
+        """移动文件成功"""
+        self.login('admin', '123456')
+        target_path = os.path.realpath(os.path.join(BASE_PATH, 'admin_dir'))
+        target_file_path = os.path.realpath(os.path.join(target_path, self.test_file_name))
+        response = self.client.post(
+            self.url_for('main.move'),
+            data={
+                'source-file-path': self.test_file_path,
+                'target-file-path': target_path
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertFalse(os.path.exists(self.test_file_path))
+        self.assertTrue(os.path.exists(target_file_path))
+        if os.path.exists(target_file_path):
+            os.remove(target_file_path)
+
+    def test_copy_file_forbidden(self):
+        """复制文件失败：无权限"""
+        # 匿名用户请求
+        target_path = os.path.realpath(os.path.join(BASE_PATH, 'admin_dir'))
+        target_file_path = os.path.realpath(os.path.join(target_path, self.test_file_name))
+        response = self.client.post(
+            self.url_for('main.copy_file'),
+            data={
+                'source-file-path': self.test_file_path,
+                'target-file-path': target_path
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 404)
+        self.assertTrue(os.path.exists(self.test_file_path))
+        self.assertFalse(os.path.exists(target_file_path))
+
+        # 普通用户请求
+        self.login(self.user.user_name, '123456')
+        response = self.client.post(
+            self.url_for('main.copy_file'),
+            data={
+                'source-file-path': self.test_file_path,
+                'target-file-path': target_path
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 404)
+        self.assertTrue(os.path.exists(self.test_file_path))
+        self.assertFalse(os.path.exists(target_file_path))
+
+    def test_copy_file(self):
+        """复制文件成功"""
+        self.login('admin', '123456')
+        target_path = os.path.realpath(os.path.join(BASE_PATH, 'admin_dir'))
+        target_file_path = os.path.realpath(os.path.join(target_path, self.test_file_name))
+        response = self.client.post(
+            self.url_for('main.copy_file'),
+            data={
+                'source-file-path': self.test_file_path,
+                'target-file-path': target_path
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(os.path.exists(self.test_file_path))
+        self.assertTrue(os.path.exists(target_file_path))
+        if os.path.exists(target_file_path):
+            os.remove(target_file_path)
