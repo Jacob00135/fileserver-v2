@@ -62,7 +62,7 @@
                     <!-- 删除文件表单 [start] -->
                     <form action="{{ url_for('main.remove') }}" method="post" name="delete-file">
 
-                        确定要删除文件<span class="bg-danger bg-opacity-75 px-1 rounded-1 file-name"></span>吗？
+                        确定要删除<span class="bg-danger bg-opacity-75 px-1 rounded-1 file-name"></span>吗？
 
                         <input type="text" class="d-none" name="path" value="javascript" required/>
 
@@ -477,7 +477,7 @@
                                 <a class="dropdown-item full-file-name" href="javascript:;"
                                    data-file-name="{% if root_page %}{{ file.path }}{% else %}{{ file.name }}{% endif %}">查看完整文件名</a>
                             </li>
-                            {% if current_user.is_admin() %}
+                            {% if current_user.is_admin() and not root_page %}
                                 <li>
                                     <a class="dropdown-item copy" href="javascript:;" data-file-path="{{ file.path }}">复制</a>
                                 </li>

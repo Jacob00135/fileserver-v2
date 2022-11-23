@@ -114,17 +114,24 @@ def remove():
         abort(404)
     path = os.path.realpath(path)
 
-    # 删除文件
-    dir_path = path
+    # 要删除的是一个文件
+    dir_path = os.path.dirname(path)
     if os.path.isfile(path):
-        dir_path = os.path.dirname(path)
         try:
             os.remove(path)
         except Exception as e:
             flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
         return redirect(url_for('main.index', path=dir_path))
 
-    return 'response dir'
+    # 要删除的是整个目录
+    if VisibleDir.query.filter_by(dir_path=path).first() is not None or os.path.ismount(path):
+        flash(ErrorInfo.REMOVE_ROOT)
+        return redirect(url_for('main.index', path=dir_path))
+    try:
+        shutil.rmtree(path)
+    except Exception as e:
+        flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
+    return redirect(url_for('main.index', path=dir_path))
 
 
 @main.route('/rename', methods=['POST'])
@@ -164,7 +171,15 @@ def rename():
             flash(ErrorInfo.RENAME_UNKNOWN.format(e.args[0]))
         return redirect(url_for('main.index', path=dir_path))
 
-    return 'response dir'
+    # 重命名目录
+    if VisibleDir.query.filter_by(dir_path=path).first() is not None or os.path.ismount(path):
+        flash(ErrorInfo.RENAME_ROOT)
+        return redirect(url_for('main.index', path=dir_path))
+    try:
+        os.rename(path, new_path)
+    except Exception as e:
+        flash(ErrorInfo.RENAME_UNKNOWN.format(e.args[0]))
+    return redirect(url_for('main.index', path=dir_path))
 
 
 @main.route('/move', methods=['POST'])
@@ -176,10 +191,8 @@ def move():
         abort(404)
     path = os.path.realpath(path)
 
-    # 获取文件的源目录
-    dir_path = path
-    if os.path.isfile(path):
-        dir_path = os.path.dirname(path)
+    # 获取文件所在目录
+    dir_path = os.path.dirname(path)
 
     # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径、目标路径下是否已有同名文件
     target_path = request.form.get('target-file-path', '', type=str)
@@ -206,7 +219,15 @@ def move():
             flash(ErrorInfo.MOVE_UNKNOWN.format(e.args[0]))
         return redirect(url_for('main.index', path=dir_path))
 
-    return 'move dir'
+    # 移动目录
+    if VisibleDir.query.filter_by(dir_path=path).first() is not None or os.path.ismount(path):
+        flash(ErrorInfo.MOVE_ROOT)
+        return redirect(url_for('main.index', path=dir_path))
+    try:
+        shutil.move(path, target_file_path)
+    except Exception as e:
+        flash(ErrorInfo.MOVE_UNKNOWN.format(e.args[0]))
+    return redirect(url_for('main.index', path=dir_path))
 
 
 @main.route('/copy_file', methods=['POST'])
@@ -219,9 +240,7 @@ def copy_file():
     path = os.path.realpath(path)
 
     # 获取文件的源目录
-    dir_path = path
-    if os.path.isfile(path):
-        dir_path = os.path.dirname(path)
+    dir_path = os.path.dirname(path)
 
     # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径、目标路径下是否已有同名文件
     target_path = request.form.get('target-file-path', '', type=str)
@@ -248,7 +267,15 @@ def copy_file():
             flash(ErrorInfo.COPY_UNKNOWN.format(e.args[0]))
         return redirect(url_for('main.index', path=dir_path))
 
-    return 'move dir'
+    # 复制目录
+    if os.path.ismount(path):
+        flash(ErrorInfo.COPY_ROOT)
+        return redirect(url_for('main.index', path=dir_path))
+    try:
+        shutil.copytree(path, target_file_path)
+    except Exception as e:
+        flash(ErrorInfo.COPY_UNKNOWN.format(e.args[0]))
+    return redirect(url_for('main.index', path=dir_path))
 
 
 @main.route('/upload_file', methods=['POST'])
@@ -301,6 +328,4 @@ def create_dir():
         os.mkdir(dir_path)
     except Exception as e:
         flash(ErrorInfo.CREATE_DIR_UNKNOWN.format(e.args[0]))
-        return redirect(url_for('main.index', path=path))
-
     return redirect(url_for('main.index', path=path))

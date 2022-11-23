@@ -270,7 +270,7 @@
     <!-- 页面主体内容 [start] -->
     <div id="app" class="container-md">
 
-        <!-- 登录失败时的闪现消息 [start] -->
+        <!-- 顶部闪现消息 [start] -->
         {% for message in get_flashed_messages() %}
         <div class="alert alert-danger alert-dismissible fade show mx-n3 top-alert" role="alert">
             {{ message }}
@@ -278,7 +278,7 @@
                     aria-label="Close"></button>
         </div>
         {% endfor %}
-        <!-- 登录失败时的闪现消息 [end] -->
+        <!-- 顶部闪现消息 [end] -->
 
         {% block content %}
         {% endblock content %}

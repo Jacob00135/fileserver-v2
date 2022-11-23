@@ -72,27 +72,31 @@ class ErrorInfo(object):
     VISIBLE_DIR_EXISTS = '可见目录已存在！'
 
     # 删除文件相关
-    REMOVE_UNKNOWN = '删除文件失败：{}'
+    REMOVE_UNKNOWN = '删除失败：{}'
+    REMOVE_ROOT = '不能删除根目录或可见目录！'
 
     # 文件重命名相关
-    RENAME_NEW_FILENAME_ILLEGAL = '文件名不能包含\\/:*?"<>|'
-    RENAME_FILENAME_SAME = '新文件名与原文件名相同'
-    RENAME_FILE_EXISTS = '同目录下已有相同文件名'
-    RENAME_UNKNOWN = '重命名文件失败：{}'
+    RENAME_NEW_FILENAME_ILLEGAL = '新名称不能包含\\/:*?"<>|'
+    RENAME_FILENAME_SAME = '新名称与原名称相同'
+    RENAME_FILE_EXISTS = '同目录下已有相同名称'
+    RENAME_UNKNOWN = '重命名失败：{}'
+    RENAME_ROOT = '不能对根目录或可见目录重命名！'
 
     # 移动文件相关
     MOVE_TARGET_NOT_ISABS = '目标路径必须是绝对路径！'
     MOVE_TARGET_NOT_EXISTS = '目标路径不存在！'
     MOVE_TARGET_NOT_ISDIR = '目标路径必须是目录！'
     MOVE_TARGET_EXISTS_FILE = '目标路径已存在同名文件！'
-    MOVE_UNKNOWN = '移动文件失败：{}'
+    MOVE_UNKNOWN = '移动失败：{}'
+    MOVE_ROOT = '不能移动根目录或可见目录！'
 
     # 复制文件相关
     COPY_TARGET_NOT_ISABS = '目标路径必须是绝对路径！'
     COPY_TARGET_NOT_EXISTS = '目标路径不存在！'
     COPY_TARGET_NOT_ISDIR = '目标路径必须是目录！'
     COPY_TARGET_EXISTS_FILE = '目标路径已存在同名文件！'
-    COPY_UNKNOWN = '移动文件失败：{}'
+    COPY_UNKNOWN = '复制失败：{}'
+    COPY_ROOT = '不能复制根目录！'
 
     # 上传文件相关
     UPLOAD_DIR_ILLEGAL = '要上传的目录路径不合法'
