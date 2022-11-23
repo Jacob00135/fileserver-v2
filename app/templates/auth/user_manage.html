@@ -28,6 +28,8 @@
                     <!-- 添加用户表单 [start] -->
                     <form action="{{ url_for('auth.add_user') }}" method="post" name="add-user">
 
+                        <div class="bg-danger bg-opacity-75 px-1 rounded-1 mb-2">注意：用户名和密码都只能有数字字母和@()_-，且长度是6~16</div>
+
                         <!-- 用户名 [start] -->
                         <div class="mb-3">
                             <label for="login-user-name" class="form-label">用户名</label>

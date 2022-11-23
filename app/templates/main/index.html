@@ -125,8 +125,8 @@
                         <!-- 新名称 [end] -->
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-danger gray-shadow me-4">确定</button>
-                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-info gray-shadow me-4">确定</button>
+                            <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
                         </div>
                     </form>
                     <!-- 重命名文件表单 [end] -->
@@ -180,8 +180,8 @@
                         <!-- 目标路径 [end] -->
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-danger gray-shadow me-4">确定</button>
-                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-info gray-shadow me-4">确定</button>
+                            <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
                         </div>
                     </form>
                     <!-- 移动文件表单 [end] -->
@@ -235,8 +235,8 @@
                         <!-- 目标路径 [end] -->
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-danger gray-shadow me-4">确定</button>
-                            <button type="button" class="btn btn-info gray-shadow" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-info gray-shadow me-4">确定</button>
+                            <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
                         </div>
                     </form>
                     <!-- 移动文件表单 [end] -->
@@ -248,12 +248,138 @@
         </div>
     </div>
     <!-- 复制文件 [end] -->
+
+    <!-- 上传文件模态框 [start] -->
+    <div class="modal fade" id="upload-file-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">上传文件</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 上传文件表单 [start] -->
+                    <form enctype="multipart/form-data" action="{{ url_for('main.upload_file') }}" method="post"
+                          name="upload-file">
+
+                        <!-- 隐藏的表单：当前目录路径 -->
+                        <input type="text" class="d-none" name="path" value="{{ current_dir_path }}"/>
+
+                        <!-- 文件输入框 -->
+                        <div class="mb-3">
+                            <label for="file"
+                                   class="form-label bg-danger bg-opacity-75 px-1 rounded-1">{{ UPLOAD_FILE_HINT_INFO }}</label>
+                            <input class="form-control" type="file" id="file" name="file" required autocomplete="off"
+                                   data-max-size="{{ UPLOAD_FILE_MAX_SIZE }}"/>
+                        </div>
+
+                        <!-- 文件上传进度条 -->
+                        <div class="progress d-none">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
+                        </div>
+
+                        <!-- 警告框 -->
+                        <div class="alert alert-danger alert-dismissible mt-3 d-none" role="alert">
+                            <div class="text" data-upload-file-hint-info="{{ UPLOAD_FILE_HINT_INFO }}"></div>
+                            <button type="button" class="btn-close"></button>
+                        </div>
+
+                        <!-- 提交按钮 -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-info gray-shadow me-4">上传</button>
+                            <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+
+                    </form>
+                    <!-- 上传文件表单 [start] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 上传文件模态框 [end] -->
+
+    <!-- 新建目录模态框 [start] -->
+    <div class="modal fade" id="create-dir-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">新建目录</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 新建目录表单 [start] -->
+                    <form action="{{ url_for('main.create_dir') }}" method="post" name="create-dir">
+
+                        <!-- 隐藏的控件：当前目录的绝对路径 -->
+                        <input type="text" class="d-none" name="path" value="{{ current_dir_path }}"/>
+
+                        <!-- 新建目录名称 [start] -->
+                        <div class="mb-3">
+                            <label for="create-dir-dir-name" class="form-label">目录名称</label>
+                            <input type="text" class="form-control dark-mode-input" name="dir-name"
+                                   id="create-dir-dir-name" required autocomplete="off"/>
+                        </div>
+                        <!-- 新建目录名称 [end] -->
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-info gray-shadow me-4">确定</button>
+                            <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                    <!-- 新建目录表单 [start] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 新建目录模态框 [end] -->
 {% endblock modal %}
 
 {% block content %}
 <h1 class="text-white text-center my-4">文件系统</h1>
 <div class="row">
     <div class="col px-0">
+
+        <!-- 顶部操作按钮组 [start] -->
+        {% if not root_page and current_user.is_authenticated %}
+            <div class="btn-group d-block text-center mb-2 action-group" role="group">
+                <button type="button" class="btn btn-info rounded-2 gray-shadow" id="upload-file" data-bs-toggle="modal"
+                        data-bs-target="#upload-file-modal">
+                    上传文件
+                </button>
+                {% if current_user.is_admin() %}
+                    <button type="button" class="btn btn-info rounded-2 gray-shadow" id="create-dir"
+                            data-bs-toggle="modal" data-bs-target="#create-dir-modal">
+                        新建目录
+                    </button>
+                {% endif %}
+            </div>
+        {% endif %}
+        <!-- 顶部操作按钮组 [end] -->
 
         <!-- 路径导航 [start] -->
         {% if not root_page %}

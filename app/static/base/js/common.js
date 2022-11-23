@@ -18,13 +18,11 @@
             (new bootstrap.Modal(modal, {keyboard: false})).show();
         },
 
-        copy: (text, father) => {
-            const input = document.createElement('input');
-            input.value = text;
-            father.appendChild(input);
-            input.select();
-            document.execCommand('copy');
-            father.removeChild(input);
+    };
+
+    window.MyAJAX = {
+        uploadFile: (form) => {
+
         }
     };
 

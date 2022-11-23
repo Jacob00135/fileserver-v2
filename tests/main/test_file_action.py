@@ -235,3 +235,65 @@ class FileActionTestCase(BaseUnittestCase):
         self.assertTrue(os.path.exists(target_file_path))
         if os.path.exists(target_file_path):
             os.remove(target_file_path)
+
+    def test_create_dir_forbidden(self):
+        """创建目录：无权限"""
+        # 匿名用户请求
+        dir_name = 'test_dir'
+        dir_path = os.path.abspath(os.path.join(BASE_PATH, dir_name))
+        response = self.client.post(
+            self.url_for('main.create_dir'),
+            data={
+                'path': BASE_PATH,
+                'dir-name': dir_name
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 404)
+        self.assertFalse(os.path.exists(dir_path))
+
+        # 普通用户请求
+        self.login(self.user.user_name, '123456')
+        response = self.client.post(
+            self.url_for('main.create_dir'),
+            data={
+                'path': BASE_PATH,
+                'dir-name': dir_name
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 404)
+        self.assertFalse(os.path.exists(dir_path))
+
+    def test_create_dir_filename_illegal(self):
+        """创建目录：目录名不合法"""
+        self.login('admin', '123456')
+        dir_name = '1234?'
+        dir_path = os.path.abspath(os.path.join(BASE_PATH, dir_name))
+        response = self.client.post(
+            self.url_for('main.create_dir'),
+            data={
+                'path': BASE_PATH,
+                'dir-name': dir_name
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertFalse(os.path.exists(dir_path))
+
+    def test_create_dir(self):
+        """创建目录成功"""
+        self.login('admin', '123456')
+        dir_name = 'test_dir'
+        dir_path = os.path.abspath(os.path.join(BASE_PATH, dir_name))
+        response = self.client.post(
+            self.url_for('main.create_dir'),
+            data={
+                'path': BASE_PATH,
+                'dir-name': dir_name
+            },
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(os.path.exists(dir_path))
+        os.rmdir(dir_path)

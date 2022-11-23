@@ -1,8 +1,8 @@
 import os
 
 
-BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-DATABASE_DIR_PATH = os.path.join(BASE_PATH, 'app/database_sqlite')
+BASE_PATH = os.path.realpath(os.path.dirname(__file__))
+DATABASE_DIR_PATH = os.path.realpath(os.path.join(BASE_PATH, 'app/database_sqlite'))
 
 
 class Config(object):
@@ -16,7 +16,8 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # 上传文件相关
-    MAX_CONTENT_LENGTH = 2 * 1024 * 1024 * 1024  # 限制上传文件的大小为2GB
+    MAX_CONTENT_LENGTH = 4 * 1024 * 1024 * 1024  # 限制上传文件的大小
+    UPLOAD_FILE_TOO_LARGE_ERROR = '上传的文件不能超过4GB'  # 当上传文件超过指定大小时的提示信息
 
     # 用户名不允许出现的字符
     USER_NAME_ILLEGAL_CHAR = '[^a-zA-Z0-9@()_-]'
@@ -57,11 +58,11 @@ class ErrorInfo(object):
     USER_NAME_NULL = '用户名不能为空！'
     USER_NOT_EXISTS = '用户名不存在！'
     USER_EXISTS = '用户已存在！'
-    USER_NAME_ILLEGAL = '用户名不合法：只能是数字字母和@()_-，且长度是6~16'
+    USER_NAME_ILLEGAL = '用户名不合法：只能有数字字母和@()_-，且长度是6~16'
     USER_LOGGED = '已登录用户不可重复登录'
     USER_PASSWORD_NULL = '密码不能为空！'
     USER_PASSWORD_WRONG = '密码错误'
-    USER_PASSWORD_ILLEGAL = '密码不合法：只能是数字字母和@()_-，且长度是6~16'
+    USER_PASSWORD_ILLEGAL = '密码不合法：只能有数字字母和@()_-，且长度是6~16'
     USER_PASSWORD_SAME = '不能与原密码一样！'
 
     # 可见目录管理相关
@@ -92,6 +93,18 @@ class ErrorInfo(object):
     COPY_TARGET_NOT_ISDIR = '目标路径必须是目录！'
     COPY_TARGET_EXISTS_FILE = '目标路径已存在同名文件！'
     COPY_UNKNOWN = '移动文件失败：{}'
+
+    # 上传文件相关
+    UPLOAD_DIR_ILLEGAL = '要上传的目录路径不合法'
+    UPLOAD_NO_FILE = '未选择文件'
+    UPLOAD_FILENAME_ILLEGAL = '文件名不能包含\\/:*?"<>|'
+    UPLOAD_FILE_EXISTS = '同目录下已有同名文件'
+    UPLOAD_FILE_TOO_LARGE = Config.UPLOAD_FILE_TOO_LARGE_ERROR
+
+    # 新建目录相关
+    CREATE_DIR_NAME_ILLEGAL = '目录名不能包含\\/:*?"<>|'
+    CREATE_DIR_EXISTS = '已有同名目录'
+    CREATE_DIR_UNKNOWN = '创建目录失败：{}'
 
 
 class UserNameError(object):

@@ -1,8 +1,8 @@
 import os
 import shutil
-from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash
-from flask_login import current_user
-from config import ErrorInfo
+from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify
+from flask_login import current_user, login_required
+from config import ErrorInfo, Config
 from app.model import VisibleDir
 from app.untils import get_upper_path, sort_file_list, get_nav_path, check_path_query_param, admin_required, \
     check_filename
@@ -52,7 +52,9 @@ def index():
         root_page=False,  # 是否是根页面
         upper_path=upper_path,  # 上一级路径
         current_dir_path=p.path,  # 当前目录绝对路径
-        nav_path=get_nav_path(p)  # 面包屑导航路径
+        nav_path=get_nav_path(p),  # 面包屑导航路径
+        UPLOAD_FILE_MAX_SIZE=Config.MAX_CONTENT_LENGTH,  # 上传文件的最大字节
+        UPLOAD_FILE_HINT_INFO=Config.UPLOAD_FILE_TOO_LARGE_ERROR  # 上传文件提示信息
     )
 
 
@@ -74,6 +76,11 @@ def forbidden(e):
 @main.app_errorhandler(405)
 def method_not_allowed(e):
     return render_template('base/404.html'), 404
+
+
+@main.app_errorhandler(413)
+def request_entity_too_large(e):
+    return jsonify({'status': 0, 'message': ErrorInfo.UPLOAD_FILE_TOO_LARGE})
 
 
 @main.route('/download')
@@ -144,7 +151,7 @@ def rename():
         return redirect(url_for('main.index', path=dir_path))
 
     # 检查同目录下是否已有同名文件
-    new_path = os.path.realpath(os.path.join(dir_path, new_filename))
+    new_path = os.path.abspath(os.path.join(dir_path, new_filename))
     if os.path.exists(new_path):
         flash(ErrorInfo.RENAME_FILE_EXISTS)
         return redirect(url_for('main.index', path=dir_path))
@@ -186,7 +193,7 @@ def move():
     if not os.path.isdir(target_path):
         flash(ErrorInfo.MOVE_TARGET_NOT_ISDIR)
         return redirect(url_for('main.index', path=dir_path))
-    target_file_path = os.path.realpath(os.path.join(target_path, os.path.basename(path)))
+    target_file_path = os.path.abspath(os.path.join(target_path, os.path.basename(path)))
     if os.path.exists(target_file_path):
         flash(ErrorInfo.MOVE_TARGET_EXISTS_FILE)
         return redirect(url_for('main.index', path=dir_path))
@@ -228,12 +235,12 @@ def copy_file():
     if not os.path.isdir(target_path):
         flash(ErrorInfo.COPY_TARGET_NOT_ISDIR)
         return redirect(url_for('main.index', path=dir_path))
-    target_file_path = os.path.realpath(os.path.join(target_path, os.path.basename(path)))
+    target_file_path = os.path.abspath(os.path.join(target_path, os.path.basename(path)))
     if os.path.exists(target_file_path):
         flash(ErrorInfo.COPY_TARGET_EXISTS_FILE)
         return redirect(url_for('main.index', path=dir_path))
 
-    # 移动文件
+    # 复制文件
     if os.path.isfile(path):
         try:
             shutil.copy(path, target_file_path)
@@ -242,3 +249,58 @@ def copy_file():
         return redirect(url_for('main.index', path=dir_path))
 
     return 'move dir'
+
+
+@main.route('/upload_file', methods=['POST'])
+@login_required
+def upload_file():
+    # 检查目录路径
+    path = request.form.get('path', '', type=str)
+    if not check_path_query_param(path) or not os.path.isdir(path):
+        return jsonify({'status': 0, 'message': ErrorInfo.UPLOAD_DIR_ILLEGAL})
+    path = os.path.realpath(path)
+
+    # 检查文件
+    file = request.files.get('file')
+    if file is None:
+        return jsonify({'status': 0, 'message': ErrorInfo.UPLOAD_NO_FILE})
+    filename = file.filename
+    if not check_filename(filename):
+        return jsonify({'status': 0, 'message': ErrorInfo.UPLOAD_FILENAME_ILLEGAL})
+    file_path = os.path.abspath(os.path.join(path, filename))
+    if os.path.exists(file_path):
+        return jsonify({'status': 0, 'message': ErrorInfo.UPLOAD_FILE_EXISTS})
+
+    # 保存文件
+    file.save(file_path)
+
+    return {'status': 1}
+
+
+@main.route('/create_dir', methods=['POST'])
+@admin_required
+def create_dir():
+    # 检查目录路径
+    path = request.form.get('path', '', type=str)
+    if not check_path_query_param(path) or not os.path.isdir(path):
+        abort(404)
+    path = os.path.realpath(path)
+
+    # 检查目录名称
+    dir_name = request.form.get('dir-name', '', type=str)
+    if dir_name == '' or not check_filename(dir_name):
+        flash(ErrorInfo.CREATE_DIR_NAME_ILLEGAL)
+        return redirect(url_for('main.index', path=path))
+    dir_path = os.path.abspath(os.path.join(path, dir_name))
+    if os.path.exists(dir_path):
+        flash(ErrorInfo.CREATE_DIR_EXISTS)
+        return redirect(url_for('main.index', path=path))
+
+    # 创建目录
+    try:
+        os.mkdir(dir_path)
+    except Exception as e:
+        flash(ErrorInfo.CREATE_DIR_UNKNOWN.format(e.args[0]))
+        return redirect(url_for('main.index', path=path))
+
+    return redirect(url_for('main.index', path=path))

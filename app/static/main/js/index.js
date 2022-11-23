@@ -102,4 +102,79 @@
         });
     })();
 
+    // 上传文件
+    (() => {
+        const form = document.forms['upload-file'];
+        const fileInput = form.querySelector('input[name="file"]');
+        const submitBtn = form.querySelector('[type="submit"]');
+        const progressBox = form.querySelector('.progress');
+        const progress = form.querySelector('.progress .progress-bar');
+        const errorHint = form.querySelector('.alert');
+        const errorTextNode = form.querySelector('.alert .text');
+        const closeBtn = form.querySelector('.alert .btn-close');
+        const maxFileSize = parseInt(fileInput.getAttribute('data-max-size'));
+        const uploadFileHintInfo = errorTextNode.getAttribute('data-upload-file-hint-info');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // 检查文件大小
+            const file = fileInput.files[0];
+            if (file.size > maxFileSize) {
+                errorTextNode.innerHTML = uploadFileHintInfo;
+                errorHint.classList.remove('d-none');
+                return undefined;
+            }
+
+            // 提交文件前，先把警告框隐藏、上传按钮禁用
+            submitBtn.setAttribute('disabled', '');
+            errorHint.classList.add('d-none');
+
+            // ajax提交文件
+            const url = form.getAttribute('action');
+            const formData = new FormData(form);
+            const xhr = new XMLHttpRequest();
+
+            // 上传文件进度
+            progressBox.classList.remove('d-none');
+            progress.setAttribute('aria-valuenow', '0');
+            progress.style.width = '0';
+            progress.innerHTML = '';
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const rate = Math.floor((e.loaded / e.total) * 100);
+                    progress.setAttribute('aria-valuenow', String(rate));
+                    progress.style.width = rate + '%';
+                    if (rate > 99) {
+                        progress.innerHTML = '上传完毕，正在保存文件，请等待...';
+                    } else {
+                        progress.innerHTML = rate + '%';
+                    }
+                }
+            });
+
+            xhr.open('post', url, true);
+            xhr.send(formData);
+
+            // 处理响应
+            xhr.addEventListener('readystatechange', () => {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.status === 0) {
+                        errorTextNode.innerHTML = data.message;
+                        errorHint.classList.remove('d-none');
+                        submitBtn.removeAttribute('disabled');
+                        progressBox.classList.add('d-none');
+                    } else {
+                        location.reload();
+                    }
+                }
+            });
+        });
+
+        closeBtn.addEventListener('click', (e) => {
+            errorHint.classList.add('d-none');
+        });
+    })();
+
 })(window, document);
