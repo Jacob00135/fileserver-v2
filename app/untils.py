@@ -1,9 +1,12 @@
 import os
 import re
+from collections import deque
+from zipfile import ZipFile, ZIP_STORED, ZIP_DEFLATED, ZIP_LZMA
 from collections import OrderedDict
 from functools import wraps
 from flask import abort
 from flask_login import current_user
+from sqlalchemy import and_
 from config import ErrorInfo, UserNameError, UserPasswordError
 from app import db
 from app.model import Users, VisibleDir
@@ -65,6 +68,7 @@ def admin_required(func):
         if not current_user.is_admin():
             abort(403)
         return func(*args, **kwargs)
+
     return decorator
 
 
@@ -82,18 +86,14 @@ def check_dir_path(dir_path: str) -> dict:
 
 def match_visible_dir(path: str) -> DirPath or MountPath or None:
     """使用一个目录的路径匹配数据库中的可见目录"""
-    # 生成路径哈希表
-    visible_dir_list = VisibleDir.query.filter(VisibleDir.dir_permission <= current_user.permission).all()
-    path_set = set()
-    for visible_dir in visible_dir_list:
-        path_set.add(visible_dir.dir_path)
-
     # 匹配：不断用父级目录匹配数据库可见目录
     if os.path.ismount(path):
         p = MountPath(path)
     else:
         p = DirPath(path)
-    while p is not None and p.path not in path_set:
+
+    while p is not None and not VisibleDir.query.filter(
+            and_(VisibleDir.dir_path == p.path, VisibleDir.dir_permission <= current_user.permission)).all():
         p = p.father
     if p is None:
         return None
@@ -102,19 +102,14 @@ def match_visible_dir(path: str) -> DirPath or MountPath or None:
 
 def get_upper_path(p: MountPath or DirPath, permission: str):
     """获取上一级路径"""
-    # 生成路径哈希表
-    visible_dir_list = VisibleDir.query.filter(VisibleDir.dir_permission <= permission).all()
-    path_set = set()
-    for visible_dir in visible_dir_list:
-        path_set.add(visible_dir.dir_path)
-
     # 当前路径已是磁盘根路径，将会转到根页面
     if p.father_path is None:
         return ''
-    
+
     # 如果上一级有权限访问，则转到上一级，否则转到根页面
     temp_p = p.father
-    while temp_p is not None and temp_p.path not in path_set:
+    while temp_p is not None and not VisibleDir.query.filter(
+            and_(VisibleDir.dir_path == temp_p.path, VisibleDir.dir_permission <= permission)).all():
         temp_p = temp_p.father
     if temp_p is not None:
         return p.father_path
@@ -178,3 +173,76 @@ def check_filename(filename: str) -> bool:
     except StopIteration:
         return True
     return False
+
+
+def compress_file(file_path_list: list, output_path: str, compress_type=None) -> None:
+    """
+    将多个文件添加到压缩包。注意！若目标压缩包已存在，会被覆盖！
+    :param file_path_list: list[str]. 需要压缩的文件路径列表，可以包含目录，但是不能包含磁盘根目录
+    :param output_path: str. 输出文件路径，必须以.zip结尾
+    :param compress_type: str. 默认为None。只接收None、"zip"、"lzma"，对应仅存储、zip算法压缩、lzma算法压缩模式
+    :return: None
+    """
+    # 确定参数
+    if compress_type is None:
+        compress = ZIP_STORED
+    elif compress_type == 'zip':
+        compress = ZIP_DEFLATED
+    elif compress_type == 'lzma':
+        compress = ZIP_LZMA
+    else:
+        raise ValueError('compress_type参数只接收None、"zip"、"lzma"')
+
+    # 创建压缩文件
+    with ZipFile(output_path, 'w', compress) as z:
+        # 遍历要压缩的文件路径
+        for file_path in file_path_list:
+            # 添加文件
+            if os.path.isfile(file_path):
+                z.write(file_path, os.path.basename(file_path))
+                continue
+
+            # 添加目录
+            root = os.path.dirname(file_path)
+            for father, dir_names, filenames in os.walk(file_path):
+                rel_father = os.path.relpath(father, root)
+
+                # 防止空目录不会被添加
+                if not filenames:
+                    z.write(
+                        filename=father,
+                        arcname=rel_father
+                    )
+                    continue
+
+                # 添加非空目录的文件
+                for filename in filenames:
+                    z.write(
+                        filename=os.path.join(father, filename),
+                        arcname=os.path.join(rel_father, filename)
+                    )
+
+        z.close()
+
+
+def get_dir_struct(path: str) -> list:
+    """获取一个目录的树形结构"""
+    # 初始化队列
+    result = []
+    q = deque()
+    q.append(DirPath(path))
+
+    # 遍历树
+    while q:
+        p = q.popleft()
+        result.append({
+            'path': os.path.relpath(p.path, path),
+            'type': p.type,
+            'size': p.size
+        })
+        if p.type == 'dir':
+            q.extend(sort_file_list(p.children))
+
+    result[0]['path'] = path
+
+    return result

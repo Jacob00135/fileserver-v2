@@ -157,7 +157,7 @@
             xhr.send(formData);
 
             // 处理响应
-            xhr.addEventListener('readystatechange', () => {
+            xhr.addEventListener('readystatechange', (e) => {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const data = JSON.parse(xhr.responseText);
                     if (data.status === 0) {
@@ -174,6 +174,309 @@
 
         closeBtn.addEventListener('click', (e) => {
             errorHint.classList.add('d-none');
+        });
+    })();
+
+    // 下载目录
+    (() => {
+        const modal = document.getElementById('download-dir-modal');
+        const root = modal.querySelector('.struct .root');
+        root.struct = []; // 保存目录结构
+
+        document.querySelectorAll('#app .file-list .action-dropdown .download-dir').forEach((a) => {
+            a.addEventListener('click', (e) => {
+                // 初始化模态框
+                disabledDownload();
+                resetDownloadInfo();
+                hiddenFailFileList();
+                showLoading();
+                hiddenStructFail();
+                clearStruct();
+                (new bootstrap.Modal(modal, {keyboard: false})).show();
+
+                // 请求目录结构
+                const url = a.getAttribute('data-href');
+                MyAJAX.getJson(url).then(
+                    (data) => {
+                        buildStruct(data.result);
+                        hiddenLoading();
+                        allowDownload();
+                    },
+                    (data) => {
+                        hiddenLoading();
+                        showStructFail(data.message);
+                    }
+                );
+            });
+        });
+        modal.querySelector('.fold-all-btn').addEventListener('click', foldAll);
+        modal.querySelector('.unfold-all-btn').addEventListener('click', unfoldAll);
+        modal.querySelector('.download').addEventListener('click', (e) => {
+            disabledDownload();
+            modal.querySelector('.download-info').classList.remove('d-none');
+
+            // 初始化
+            const rootPath = root.struct[0]['path'];
+            let z = new JSZip();
+            let promise = new Promise((resolve, reject) => {
+                resolve(null);
+            });
+            root.i = 0;
+
+            function promiseFinally() {
+                // 判断是否应该退出
+                root.i = root.i + 1;
+                if (root.i >= root.struct.length) {
+                    compressStatus();
+                    return z.generateAsync({type: 'blob'});
+                }
+
+                // 判断本次要归档的是否是目录
+                const path = root.struct[root.i]['path'];
+                if (root.struct[root.i]['type'] === 'dir') {
+                    z.folder(path);
+                    return new Promise((resolve, reject) => {
+                        resolve(null);
+                    });
+                }
+
+                // 请求文件
+                const url = MyRoute.main.download(MyFunction.concatPath(rootPath, path));
+                downloadStatus(path);
+                return MyAJAX.getFile(url);
+            }
+
+            // 逐个请求文件
+            for (let i = 0; i < root.struct.length; i++) {
+                promise = promise.then(
+                    (response) => {
+                        // 处理上一次promise的结果
+                        if (response) {
+                            const path = root.struct[root.i]['path'];
+                            z.file(path, response);
+
+                            // 提示下载成功，添加“√”
+                            // 寻找下载失败的文件项目
+                            let failItem;
+                            const itemArr = root.querySelectorAll('.item');
+                            for (let i = 0; i < itemArr.length; i++) {
+                                if (itemArr[i].getAttribute('data-path') === path) {
+                                    failItem = itemArr[i];
+                                    break;
+                                }
+                            }
+                            failItem.classList.add('download-success');
+                        }
+
+                        return promiseFinally();
+                    },
+                    (xhr) => {
+                        // 处理失败请求
+
+                        // 寻找下载失败的文件项目
+                        const path = root.struct[root.i]['path'];
+                        let failItem;
+                        const itemArr = root.querySelectorAll('.item');
+                        for (let i = 0; i < itemArr.length; i++) {
+                            if (itemArr[i].getAttribute('data-path') === path) {
+                                failItem = itemArr[i];
+                                break;
+                            }
+                        }
+
+                        // 添加“×”
+                        failItem.classList.add('download-fail');
+
+                        // 将失败的文件项目添加到文件列表
+                        const item = document.createElement('li');
+                        item.classList.add('item');
+                        item.classList.add('text-light');
+                        item.classList.add('py-1');
+                        item.textContent = path;
+                        modal.querySelector('.fail-file-list .list').append(item);
+                        showFailFileList();
+
+                        return promiseFinally();
+                    }
+                );
+            }
+
+            // 导出zip
+            promise.then((content) => {
+                downloadFinishStatus();
+                saveAs(content, MyFunction.splitPath(rootPath)[1] + '.zip');
+            });
+        });
+
+        function resetDownloadInfo() {
+            modal.querySelector('.download-info').classList.add('d-none');
+            modal.querySelector('.download-info .downloading').classList.remove('d-none');
+            modal.querySelector('.download-info .compressing').classList.add('d-none');
+            modal.querySelector('.download-info .success').classList.add('d-none');
+            modal.querySelector('.download-info .filename').classList.remove('d-none');
+            modal.querySelector('.download-info .loading-anime').classList.remove('d-none');
+        }
+
+        function downloadStatus(filename) {
+            modal.querySelector('.download-info .filename').textContent = filename;
+        }
+
+        function compressStatus() {
+            modal.querySelector('.download-info .downloading').classList.add('d-none');
+            modal.querySelector('.download-info .filename').classList.add('d-none');
+            modal.querySelector('.download-info .compressing').classList.remove('d-none');
+        }
+
+        function downloadFinishStatus() {
+            modal.querySelector('.download-info .downloading').classList.add('d-none');
+            modal.querySelector('.download-info .compressing').classList.add('d-none');
+            modal.querySelector('.download-info .loading-anime').classList.add('d-none');
+            modal.querySelector('.download-info .success').classList.remove('d-none');
+        }
+
+        function hiddenFailFileList() {
+            modal.querySelector('.fail-file-list').classList.add('d-none');
+        }
+
+        function showFailFileList() {
+            modal.querySelector('.fail-file-list').classList.remove('d-none');
+        }
+
+        function showLoading() {
+            modal.querySelector('.loading').classList.remove('d-none');
+        }
+
+        function hiddenLoading() {
+            modal.querySelector('.loading').classList.add('d-none');
+        }
+
+        function showStructFail(message) {
+            modal.querySelector('.load-struct-fail .message').innerHTML = message;
+            modal.querySelector('.load-struct-fail').classList.remove('d-none');
+        }
+
+        function hiddenStructFail() {
+            modal.querySelector('.load-struct-fail').classList.add('d-none');
+            modal.querySelector('.load-struct-fail .message').innerHTML = '';
+        }
+
+        function disabledDownload() {
+            modal.querySelector('.download').setAttribute('disabled', '');
+        }
+
+        function allowDownload() {
+            modal.querySelector('.download').removeAttribute('disabled');
+        }
+
+        function foldDir(e) {
+            const item = e.target.parentNode;
+            const fold = item.getAttribute('data-fold');
+            if (fold === '1') {
+                item.children[2].classList.remove('d-none');
+                item.setAttribute('data-fold', '0');
+            } else {
+                item.children[2].classList.add('d-none');
+                item.setAttribute('data-fold', '1');
+            }
+        }
+
+        function foldAll() {
+            root.querySelectorAll('.item').forEach((item) => {
+                if (item.getAttribute('data-fold') === '0') {
+                    item.querySelector('.filename').click();
+                }
+            });
+        }
+
+        function unfoldAll() {
+            root.querySelectorAll('.item').forEach((item) => {
+                if (item.getAttribute('data-fold') === '1') {
+                    item.querySelector('.filename').click();
+                }
+            });
+        }
+
+        function addFileToStruct(fatherNode, path, type, filename, size) {
+            const child = document.createElement('li');
+            child.classList.add('item');
+            child.classList.add('py-1');
+            child.setAttribute('data-path', path);
+            child.setAttribute('data-type', type);
+            child.setAttribute('data-fold', '0');
+            child.innerHTML = '<span class="filesize text-light"></span><span class="filename text-light"></span>';
+            child.querySelector('.filename').textContent = filename;
+            fatherNode.appendChild(child);
+            if (type === 'dir') {
+                const ul = document.createElement('ul');
+                ul.classList.add('list');
+                ul.setAttribute('data-path', path);
+                child.appendChild(ul);
+                child.querySelector('.filename').addEventListener('click', foldDir);
+                return ul;
+            }
+            child.querySelector('.filesize').classList.add('me-2');
+            child.querySelector('.filesize').textContent = '(' + size + ')';
+            return null;
+        }
+
+        function buildStruct(struct) {
+            root.struct = struct;
+            root.setAttribute('data-path', struct[0]['path']);
+
+            const fatherMap = {
+                '.': root
+            };
+            for (let i = 1; i < struct.length; i++) {
+                let path = struct[i]['path'];
+                let type = struct[i]['type'];
+                let size = struct[i]['size'];
+                let [father, filename] = MyFunction.splitPath(path);
+
+                let newFather = addFileToStruct(fatherMap[father], path, type, filename, size);
+                if (newFather) {
+                    fatherMap[path] = newFather;
+                }
+            }
+
+            foldAll();
+            root.classList.remove('d-none');
+        }
+
+        function clearStruct() {
+            root.classList.add('d-none');
+            root.innerHTML = '';
+        }
+
+    })();
+
+    // 查看目录大小
+    (() => {
+        const modal = document.getElementById('dir-size-modal');
+
+        document.querySelectorAll('#app .file-list .action-dropdown .dir-size').forEach((a) => {
+            a.addEventListener('click', (e) => {
+                // 初始化模态框
+                modal.querySelector('.fail-info').classList.add('d-none');
+                modal.querySelector('.dir-info').classList.add('d-none');
+                modal.querySelector('.loading').classList.remove('d-none');
+                modal.querySelector('.dir-info .name').textContent = a.getAttribute('data-file-name');
+                (new bootstrap.Modal(modal, {keyboard: false})).show();
+
+                // AJAX请求目录大小
+                const url = a.getAttribute('data-href');
+                MyAJAX.getJson(url).then(
+                    (data) => {
+                        modal.querySelector('.dir-info .size').textContent = data.result;
+                        modal.querySelector('.loading').classList.add('d-none');
+                        modal.querySelector('.dir-info').classList.remove('d-none');
+                    },
+                    (data) => {
+                        modal.querySelector('.fail-info .message').textContent = data.message;
+                        modal.querySelector('.loading').classList.add('d-none');
+                        modal.querySelector('.fail-info').classList.remove('d-none');
+                    }
+                );
+            });
         });
     })();
 

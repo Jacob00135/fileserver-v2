@@ -5,8 +5,8 @@ from flask_login import current_user, login_required
 from config import ErrorInfo, Config
 from app.model import VisibleDir
 from app.untils import get_upper_path, sort_file_list, get_nav_path, check_path_query_param, admin_required, \
-    check_filename
-from app.path_untils import MountPath, DirPath, create_path_object
+    check_filename, get_dir_struct
+from app.path_untils import MountPath, DirPath, create_path_object, get_file_size
 
 main = Blueprint('main', __name__)
 
@@ -92,17 +92,24 @@ def download():
     path = os.path.realpath(path)
 
     # 响应文件
-    dir_path = path
+    dir_path, filename = os.path.split(path)
     if os.path.isfile(path):
-        dir_path = os.path.dirname(path)
         return send_from_directory(
             directory=dir_path,
             path=os.path.basename(path),
             as_attachment=True
         )
 
-    # 响应目录
-    return 'response dir'
+    if os.path.ismount(path):
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.DOWNLOAD_MOUNT
+        })
+
+    return jsonify({
+        'status': 1,
+        'result': get_dir_struct(path)
+    })
 
 
 @main.route('/remove', methods=['POST'])
@@ -329,3 +336,40 @@ def create_dir():
     except Exception as e:
         flash(ErrorInfo.CREATE_DIR_UNKNOWN.format(e.args[0]))
     return redirect(url_for('main.index', path=path))
+
+
+@main.route('/dir_size')
+@login_required
+def dir_size():
+    # 检查目录路径
+    path = request.args.get('path', '', type=str)
+    if not check_path_query_param(path):
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.DIR_SIZE_ILLEGAL
+        })
+    path = os.path.realpath(path)
+
+    # 检查是否是目录，是否是根路径
+    if not os.path.isdir(path):
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.DIR_SIZE_NOT_ISDIR
+        })
+    if os.path.ismount(path):
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.DIR_SIZE_MOUNT
+        })
+
+    # 计算目录大小
+    total = 0
+    for father, dir_names, filenames in os.walk(path):
+        for filename in filenames:
+            total = total + os.path.getsize(os.path.join(father, filename))
+    result = get_file_size(total)
+
+    return jsonify({
+        'status': 1,
+        'result': result
+    })

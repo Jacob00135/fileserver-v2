@@ -1,6 +1,6 @@
 import os
 import shutil
-from config import BASE_PATH
+from config import BASE_PATH, ErrorInfo
 from app import db
 from app.model import Users, VisibleDir
 from tests.auth.untils import generate_visible_dir
@@ -167,3 +167,71 @@ class DirActionTestCase(BaseUnittestCase):
         self.assertTrue(os.path.exists(self.test_dir_path))
         self.assertTrue(os.path.exists(target_path))
         shutil.rmtree(target_path)
+
+    def test_download_dir_struct(self):
+        """获取目录结构"""
+        self.login(self.user.user_name, '123456')
+        response = self.client.get(
+            self.url_for('main.download', path=os.path.realpath(os.path.join(BASE_PATH, 'app/auth'))),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json is not None)
+        self.assertTrue(response.json.get('status', 0) == 1)
+        self.assertTrue(response.json.get('result', None) is not None)
+
+    def test_dir_size_forbidden(self):
+        """查看目录大小：无权限"""
+        response = self.client.get(
+            self.url_for('main.dir_size', path=BASE_PATH),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json is None)
+
+    def test_dir_size_not_isdir(self):
+        """查看目录大小：不是目录"""
+        self.login('admin', '123456')
+        response = self.client.get(
+            self.url_for('main.dir_size', path=os.path.realpath(os.path.join(BASE_PATH, 'requirements.txt'))),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json.get('status', 1) == 0)
+        self.assertTrue(response.json.get('message', '') == ErrorInfo.DIR_SIZE_NOT_ISDIR)
+
+    def test_dir_size_not_visible(self):
+        """查看目录大小：不在可见目录下"""
+        self.login('admin', '123456')
+        response = self.client.get(
+            self.url_for('main.dir_size', path='C:\\Users'),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json.get('status', 1) == 0)
+        self.assertTrue(response.json.get('message', '') == ErrorInfo.DIR_SIZE_ILLEGAL)
+
+    def test_dir_size_is_mount(self):
+        """查看目录大小：是根目录"""
+        db.session.add(VisibleDir(dir_path='C:\\', permission='admin'))
+        db.session.commit()
+        self.login('admin', '123456')
+        response = self.client.get(
+            self.url_for('main.dir_size', path='C:\\'),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json.get('status', 1) == 0)
+        self.assertTrue(response.json.get('message', '') == ErrorInfo.DIR_SIZE_MOUNT)
+
+    def test_dir_size(self):
+        """查看目录大小：成功"""
+        self.login('admin', '123456')
+        response = self.client.get(
+            self.url_for('main.dir_size', path=BASE_PATH),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json.get('status', 0) == 1)
+        self.assertTrue(response.json.get('message', '') == '')
+        self.assertTrue(isinstance(response.json.get('result'), str))

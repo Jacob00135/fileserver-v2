@@ -1,14 +1,15 @@
-import os
 import sqlite3
 from werkzeug.security import generate_password_hash
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import config
+from app.middleware import AfterResponse
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
+after_response = AfterResponse()
 
 
 def init_database(config_class):
@@ -57,6 +58,9 @@ def create_app(config_name):
     # Flask扩展配置
     db.init_app(app)
     login_manager.init_app(app)
+
+    # 中间件
+    after_response.init_app(app)
 
     # 初始化数据库
     init_database(config_class)

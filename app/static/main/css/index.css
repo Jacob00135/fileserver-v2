@@ -50,4 +50,95 @@
   margin-left: 0;
 }
 
+#download-dir-modal {
+  /* 文件图标 */
+  /* 展开、折叠图标样式 [start] */
+  /* 展开、折叠图标样式 [end] */
+}
+#download-dir-modal .struct .item {
+  list-style: none;
+  /* 下载失败图标 */
+  /* 下载成功图标 */
+}
+#download-dir-modal .struct .item.download-fail::after {
+  content: "\f659";
+  margin-left: 2px;
+  font-family: "bootstrap-icons";
+  font-size: 14px;
+  color: #ff9d9d;
+  font-weight: 700;
+}
+#download-dir-modal .struct .item.download-success::after {
+  content: "\f633";
+  margin-left: 2px;
+  font-family: "bootstrap-icons";
+  font-size: 14px;
+  color: #40ffb0;
+  font-weight: 700;
+}
+#download-dir-modal .fail-file-list .list .item {
+  list-style: none;
+}
+#download-dir-modal .download-info .success::before {
+  content: "\f633";
+  font-family: "bootstrap-icons";
+  color: #40ffb0;
+}
+#download-dir-modal .struct .item[data-type=package]::before {
+  content: "\f3bf";
+  margin-right: 2px;
+  font-family: "bootstrap-icons";
+  color: #000 !important;
+  font-size: 14px;
+}
+#download-dir-modal .struct .item[data-type=video]::before {
+  content: "\f21f";
+  margin-right: 2px;
+  font-family: "bootstrap-icons";
+  color: #70c3ff !important;
+  font-size: 14px;
+}
+#download-dir-modal .struct .item[data-type=image]::before {
+  content: "\f42a";
+  margin-right: 2px;
+  font-family: "bootstrap-icons";
+  color: #c4fff1 !important;
+  font-size: 14px;
+}
+#download-dir-modal .struct .item[data-type=audio]::before {
+  content: "\f49e";
+  margin-right: 2px;
+  font-family: "bootstrap-icons";
+  color: #f6801f !important;
+  font-size: 14px;
+}
+#download-dir-modal .struct .item[data-type=text]::before {
+  content: "\f3b9";
+  margin-right: 2px;
+  font-family: "bootstrap-icons";
+  color: #aedfd0 !important;
+  font-size: 14px;
+}
+#download-dir-modal .struct .item[data-type=unknown]::before {
+  content: "\f50b";
+  margin-right: 2px;
+  font-family: "bootstrap-icons";
+  color: #F8F9FA !important;
+  font-size: 14px;
+}
+#download-dir-modal .struct .item[data-type=dir] > .filename {
+  cursor: pointer;
+}
+#download-dir-modal .struct .item[data-type=dir]::before {
+  margin-right: 2px;
+  font-family: "bootstrap-icons";
+  font-size: 12px;
+}
+#download-dir-modal .struct .item[data-type=dir][data-fold="1"]::before {
+  content: "\f231";
+}
+#download-dir-modal .struct .item[data-type=dir][data-fold="0"]::before {
+  content: "\f229";
+}
+
 /*# sourceMappingURL=index.css.map */

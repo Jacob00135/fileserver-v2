@@ -5,8 +5,16 @@ def connect(path1: str, path2: str, *args) -> str:
     return os.path.realpath(os.path.join(path1, path2, *args))
 
 
-def get_file_size(file_path: str) -> str:
-    size = os.path.getsize(file_path)
+def get_file_size(file_path: str or int) -> str:
+    # 检查参数
+    if isinstance(file_path, str):
+        size = os.path.getsize(file_path)
+    elif isinstance(file_path, int):
+        size = file_path
+    else:
+        raise ValueError('file_path参数类型只能是`str`或`int`！')
+
+    # 计算大小
     unit_list = ['B', 'KB', 'MB', 'GB', 'TB']
     i = 0
     while size >= 1024:

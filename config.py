@@ -3,6 +3,8 @@ import os
 
 BASE_PATH = os.path.realpath(os.path.dirname(__file__))
 DATABASE_DIR_PATH = os.path.realpath(os.path.join(BASE_PATH, 'app/database_sqlite'))
+if not os.path.exists(DATABASE_DIR_PATH):
+    os.mkdir(DATABASE_DIR_PATH)
 
 
 class Config(object):
@@ -71,6 +73,9 @@ class ErrorInfo(object):
     VISIBLE_DIR_ISDIR = '目标路径不是目录！'
     VISIBLE_DIR_EXISTS = '可见目录已存在！'
 
+    # 下载文件相关
+    DOWNLOAD_MOUNT = '不能下载根目录！'
+
     # 删除文件相关
     REMOVE_UNKNOWN = '删除失败：{}'
     REMOVE_ROOT = '不能删除根目录或可见目录！'
@@ -109,6 +114,11 @@ class ErrorInfo(object):
     CREATE_DIR_NAME_ILLEGAL = '目录名不能包含\\/:*?"<>|'
     CREATE_DIR_EXISTS = '已有同名目录'
     CREATE_DIR_UNKNOWN = '创建目录失败：{}'
+
+    # 查看目录大小相关
+    DIR_SIZE_ILLEGAL = '目录路径不合法'
+    DIR_SIZE_NOT_ISDIR = '要查看大小的不是目录'
+    DIR_SIZE_MOUNT = '不能查看根目录的大小'
 
 
 class UserNameError(object):
