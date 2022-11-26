@@ -358,15 +358,15 @@
     </div>
     <!-- 新建目录模态框 [end] -->
 
-    <!-- 下载目录模态框 [start] -->
-    <div class="modal fade" id="download-dir-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+    <!-- 预览目录模态框 [start] -->
+    <div class="modal fade" id="preview-dir-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
          data-bs-keyboard="false">
         <div class="modal-dialog modal-lg modal-fullscreen-md-down modal-dialog-centered">
             <div class="modal-content bg-secondary text-white">
 
                 <!-- 模态框头部 [start] -->
                 <div class="modal-header position-relative">
-                    <h5 class="modal-title w-100 text-center">下载目录预览</h5>
+                    <h5 class="modal-title w-100 text-center">目录预览</h5>
                     <button type="button" class="btn-close position-absolute m-0 gray-shadow"
                             data-bs-dismiss="modal" aria-label="Close">
                     </button>
@@ -398,26 +398,6 @@
                     </div>
                     <!-- 目录结构 [end] -->
 
-                    <!-- 实时下载信息 [start] -->
-                    <div class="download-info text-center border-top d-none">
-                        <div class="h5 text-light my-3 downloading">正在下载：</div>
-                        <div class="h5 text-light my-3 d-none compressing">正在压缩...</div>
-                        <div class="h5 text-light my-3 d-none d-flex justify-content-center success">下载完毕</div>
-                        <div class="text-light mb-3 filename"></div>
-                        <div class="spinner-border text-dark loading-anime" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    <!-- 实时下载信息 [end] -->
-
-                    <!-- 下载失败的文件列表 [start] -->
-                    <div class="fail-file-list border-top d-none">
-                        <h5 class="text-center text-light my-3">下载失败文件列表</h5>
-                        <ul class="list py-1">
-                        </ul>
-                    </div>
-                    <!-- 下载失败的文件列表 [start] -->
-
                 </div>
                 <!-- 模态框内容 [end] -->
 
@@ -425,14 +405,14 @@
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-info gray-shadow fold-all-btn">全部折叠</button>
                     <button type="button" class="btn btn-info gray-shadow unfold-all-btn">全部展开</button>
-                    <button type="button" class="btn btn-info gray-shadow download" disabled>开始下载</button>
+                    <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
                 </div>
                 <!-- 模态框底部 [end] -->
 
             </div>
         </div>
     </div>
-    <!-- 下载目录模态框 [end] -->
+    <!-- 预览目录模态框 [end] -->
 
     <!-- 查看目录大小模态框 [start] -->
     <div class="modal fade" id="dir-size-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
@@ -582,7 +562,7 @@
                     </a>
 
                     <!-- 显示文件大小的区域 -->
-                    <span class="text-light py-2 file-size {% if file.size != '' %}ms-2{% endif %}">{{ file.size }}</span>
+                    <span class="text-light py-2 file-size{% if file.size != '' %} ms-2{% endif %}">{{ file.size }}</span>
 
                     <!-- 操作下拉菜单 [start] -->
                     <div class="dropdown action-dropdown d-flex">
@@ -596,23 +576,28 @@
                         <!-- 操作按钮列表 [start] -->
                         <ul class="dropdown-menu dropdown-menu-dark">
 
-                            <!-- 下载按钮 [start] -->
-                            {% if file.type != 'dir' %}
+                            <!-- 预览目录按钮 [start] -->
+                            {% if file.type == 'dir' %}
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('main.download', path=file.path) }}">下载</a>
-                                </li>
-                            {% else %}
-                                <li>
-                                    <a class="dropdown-item download-dir" href="javascript:;"
-                                       data-href="{{ url_for('main.download', path=file.path) }}">预览/下载</a>
+                                    <a class="dropdown-item preview-dir" href="javascript:;"
+                                       data-href="{{ url_for('main.preview_dir', path=file.path) }}">预览</a>
                                 </li>
                             {% endif %}
+                            <!-- 预览目录按钮 [end] -->
+
+                            <!-- 下载按钮 [start] -->
+                            <li>
+                                <a class="dropdown-item{% if file.type == 'dir' %} download-dir{% endif %}"
+                                   href="{{ url_for('main.download', path=file.path) }}">下载</a>
+                            </li>
                             <!-- 下载按钮 [start] -->
 
+                            <!-- 查看完整文件名 [start] -->
                             <li>
                                 <a class="dropdown-item full-file-name" href="javascript:;"
                                    data-file-name="{% if root_page %}{{ file.path }}{% else %}{{ file.name }}{% endif %}">查看完整文件名</a>
                             </li>
+                            <!-- 查看完整文件名 [end] -->
 
                             <!-- 查看目录大小按钮 [start] -->
                             {% if file.type == 'dir' and current_user.is_authenticated %}

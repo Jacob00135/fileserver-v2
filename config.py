@@ -120,6 +120,10 @@ class ErrorInfo(object):
     DIR_SIZE_NOT_ISDIR = '要查看大小的不是目录'
     DIR_SIZE_MOUNT = '不能查看根目录的大小'
 
+    # 预览目录相关
+    PREVIEW_DIR_ILLEGAL = '目录路径不合法'
+    PREVIEW_DIR_NOT_ISDIR = '不是目录'
+
 
 class UserNameError(object):
     ILLEGAL_CHAR = Config.USER_NAME_ILLEGAL_CHAR

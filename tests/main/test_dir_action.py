@@ -168,11 +168,11 @@ class DirActionTestCase(BaseUnittestCase):
         self.assertTrue(os.path.exists(target_path))
         shutil.rmtree(target_path)
 
-    def test_download_dir_struct(self):
-        """获取目录结构"""
+    def test_preview_dir(self):
+        """预览目录结构"""
         self.login(self.user.user_name, '123456')
         response = self.client.get(
-            self.url_for('main.download', path=os.path.realpath(os.path.join(BASE_PATH, 'app/auth'))),
+            self.url_for('main.preview_dir', path=os.path.realpath(os.path.join(BASE_PATH, 'app/auth'))),
             follow_redirects=True
         )
         self.assertTrue(response.status_code == 200)

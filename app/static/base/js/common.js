@@ -1,24 +1,7 @@
 ((window, document) => {
     'use strict';
 
-    window.MyRoute = {
-        main: {
-            download: (path) => {
-                return '/download?path=' + path;
-            }
-        }
-    };
-
     window.MyFunction = {
-        inArray: (array, value) => {
-            for (let i = 0; i < array.length; i++) {
-                if (array[i] === value) {
-                    return true;
-                }
-            }
-            return false;
-        },
-
         alert: (title = '警告', message = '') => {
             const modal = document.getElementById('hint-modal');
             modal.querySelector('.modal-title').innerHTML = title;
@@ -49,22 +32,6 @@
                 path.slice(index + 1)
             ];
         },
-
-        strip: (string, char) => {
-            let start = 0;
-            let end = string.length - 1;
-            while (string.charAt(start) === char) {
-                start = start + 1;
-            }
-            while (string.charAt(end) === char) {
-                end = end - 1;
-            }
-            return string.slice(start, end + 1);
-        },
-
-        concatPath: (path1, path2) => {
-            return MyFunction.strip(path1, '\\') + '\\' + MyFunction.strip(path2, '\\');
-        }
     };
 
     window.MyAJAX = {

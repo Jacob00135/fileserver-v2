@@ -1,11 +1,13 @@
 import os
 import shutil
-from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify
+from urllib.parse import quote
+from werkzeug.utils import secure_filename
+from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify, current_app
 from flask_login import current_user, login_required
 from config import ErrorInfo, Config
 from app.model import VisibleDir
 from app.untils import get_upper_path, sort_file_list, get_nav_path, check_path_query_param, admin_required, \
-    check_filename, get_dir_struct
+    check_filename, get_dir_struct, compress_file
 from app.path_untils import MountPath, DirPath, create_path_object, get_file_size
 
 main = Blueprint('main', __name__)
@@ -100,15 +102,34 @@ def download():
             as_attachment=True
         )
 
+    # 检查是否是根目录
     if os.path.ismount(path):
-        return jsonify({
-            'status': 0,
-            'message': ErrorInfo.DOWNLOAD_MOUNT
-        })
+        flash(ErrorInfo.DOWNLOAD_MOUNT)
+        return redirect(url_for('main.index', path=dir_path))
 
-    return jsonify({
-        'status': 1,
-        'result': get_dir_struct(path)
+    # 压缩目录
+    compress_filepath = path + '.zip'
+    compress_filename = os.path.basename(compress_filepath)
+    compress_file(file_path_list=[path], output_path=path + '.zip', compress_type=None)
+
+    # 分块读取文件
+    def read_file():
+        block_size = 1024 * 1024  # 每一块的大小，单位为字节
+        with open(compress_filepath, 'rb') as file:
+            block = file.read(block_size)
+            while block != b'':
+                yield block
+                block = file.read(block_size)
+            file.close()
+        if os.path.exists(compress_filepath):
+            os.remove(compress_filepath)
+
+    return current_app.response_class(read_file(), headers={
+        'Content-Disposition': "attachment; filename={}; filename*=UTF-8''{}".format(
+            quote(secure_filename(compress_filename)),
+            quote(compress_filename)
+        ),
+        'Content-Type': 'application/x-zip-compressed'
     })
 
 
@@ -372,4 +393,29 @@ def dir_size():
     return jsonify({
         'status': 1,
         'result': result
+    })
+
+
+@main.route('/preview_dir')
+def preview_dir():
+    # 检查查询参数
+    path = request.args.get('path', '', type=str)
+    if not check_path_query_param(path):
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.PREVIEW_DIR_ILLEGAL
+        })
+    path = os.path.realpath(path)
+
+    # 检查是否是目录路径
+    if not os.path.isdir(path):
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.PREVIEW_DIR_NOT_ISDIR
+        })
+
+    # 响应目录结构
+    return jsonify({
+        'status': 1,
+        'result': get_dir_struct(path)
     })

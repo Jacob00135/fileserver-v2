@@ -177,18 +177,14 @@
         });
     })();
 
-    // 下载目录
+    // 预览目录
     (() => {
-        const modal = document.getElementById('download-dir-modal');
+        const modal = document.getElementById('preview-dir-modal');
         const root = modal.querySelector('.struct .root');
-        root.struct = []; // 保存目录结构
 
-        document.querySelectorAll('#app .file-list .action-dropdown .download-dir').forEach((a) => {
+        document.querySelectorAll('#app .file-list .action-dropdown .preview-dir').forEach((a) => {
             a.addEventListener('click', (e) => {
                 // 初始化模态框
-                disabledDownload();
-                resetDownloadInfo();
-                hiddenFailFileList();
                 showLoading();
                 hiddenStructFail();
                 clearStruct();
@@ -200,7 +196,6 @@
                     (data) => {
                         buildStruct(data.result);
                         hiddenLoading();
-                        allowDownload();
                     },
                     (data) => {
                         hiddenLoading();
@@ -211,6 +206,9 @@
         });
         modal.querySelector('.fold-all-btn').addEventListener('click', foldAll);
         modal.querySelector('.unfold-all-btn').addEventListener('click', unfoldAll);
+
+        // region 旧的下载目录方案
+        /*
         modal.querySelector('.download').addEventListener('click', (e) => {
             disabledDownload();
             modal.querySelector('.download-info').classList.remove('d-none');
@@ -307,40 +305,9 @@
                 saveAs(content, MyFunction.splitPath(rootPath)[1] + '.zip');
             });
         });
+        */
 
-        function resetDownloadInfo() {
-            modal.querySelector('.download-info').classList.add('d-none');
-            modal.querySelector('.download-info .downloading').classList.remove('d-none');
-            modal.querySelector('.download-info .compressing').classList.add('d-none');
-            modal.querySelector('.download-info .success').classList.add('d-none');
-            modal.querySelector('.download-info .filename').classList.remove('d-none');
-            modal.querySelector('.download-info .loading-anime').classList.remove('d-none');
-        }
-
-        function downloadStatus(filename) {
-            modal.querySelector('.download-info .filename').textContent = filename;
-        }
-
-        function compressStatus() {
-            modal.querySelector('.download-info .downloading').classList.add('d-none');
-            modal.querySelector('.download-info .filename').classList.add('d-none');
-            modal.querySelector('.download-info .compressing').classList.remove('d-none');
-        }
-
-        function downloadFinishStatus() {
-            modal.querySelector('.download-info .downloading').classList.add('d-none');
-            modal.querySelector('.download-info .compressing').classList.add('d-none');
-            modal.querySelector('.download-info .loading-anime').classList.add('d-none');
-            modal.querySelector('.download-info .success').classList.remove('d-none');
-        }
-
-        function hiddenFailFileList() {
-            modal.querySelector('.fail-file-list').classList.add('d-none');
-        }
-
-        function showFailFileList() {
-            modal.querySelector('.fail-file-list').classList.remove('d-none');
-        }
+        // endregion
 
         function showLoading() {
             modal.querySelector('.loading').classList.remove('d-none');
@@ -358,14 +325,6 @@
         function hiddenStructFail() {
             modal.querySelector('.load-struct-fail').classList.add('d-none');
             modal.querySelector('.load-struct-fail .message').innerHTML = '';
-        }
-
-        function disabledDownload() {
-            modal.querySelector('.download').setAttribute('disabled', '');
-        }
-
-        function allowDownload() {
-            modal.querySelector('.download').removeAttribute('disabled');
         }
 
         function foldDir(e) {
@@ -420,7 +379,6 @@
         }
 
         function buildStruct(struct) {
-            root.struct = struct;
             root.setAttribute('data-path', struct[0]['path']);
 
             const fatherMap = {
@@ -476,6 +434,15 @@
                         modal.querySelector('.fail-info').classList.remove('d-none');
                     }
                 );
+            });
+        });
+    })();
+
+    // 下载目录时，弹出提示
+    (() => {
+        document.querySelectorAll('#app .file-list .action-dropdown .download-dir').forEach((a) => {
+            a.addEventListener('click', (e) => {
+                MyFunction.alert('提示', '目录将会被压缩，请等待...');
             });
         });
     })();

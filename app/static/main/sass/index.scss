@@ -55,40 +55,10 @@
     }
 }
 
-#download-dir-modal {
+#preview-dir-modal {
 
     .struct .item {
         list-style: none;
-
-        /* 下载失败图标 */
-        &.download-fail::after {
-            content: '\F659';
-            margin-left: 2px;
-            font-family: 'bootstrap-icons';
-            font-size: 14px;
-            color: #ff9d9d;
-            font-weight: 700;
-        }
-
-        /* 下载成功图标 */
-        &.download-success::after {
-            content: '\F633';
-            margin-left: 2px;
-            font-family: 'bootstrap-icons';
-            font-size: 14px;
-            color: #40ffb0;
-            font-weight: 700;
-        }
-    }
-
-    .fail-file-list .list .item {
-        list-style: none;
-    }
-
-    .download-info .success::before {
-        content: "\f633";
-        font-family: "bootstrap-icons";
-        color: #40ffb0;
     }
 
     /* 文件图标 */
@@ -126,6 +96,5 @@
             content: "\F229";
         }
     }
-
     /* 展开、折叠图标样式 [end] */
 }

@@ -175,7 +175,7 @@ def check_filename(filename: str) -> bool:
     return False
 
 
-def compress_file(file_path_list: list, output_path: str, compress_type=None) -> None:
+def compress_file(file_path_list: list, output_path: str, compress_type: str = None) -> None:
     """
     将多个文件添加到压缩包。注意！若目标压缩包已存在，会被覆盖！
     :param file_path_list: list[str]. 需要压缩的文件路径列表，可以包含目录，但是不能包含磁盘根目录
