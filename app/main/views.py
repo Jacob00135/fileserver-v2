@@ -1,10 +1,12 @@
 import os
 import shutil
+from time import sleep
 from urllib.parse import quote
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify, current_app
 from flask_login import current_user, login_required
 from config import ErrorInfo, Config
+from app import after_response
 from app.model import VisibleDir
 from app.untils import get_upper_path, sort_file_list, get_nav_path, check_path_query_param, admin_required, \
     check_filename, get_dir_struct, compress_file
@@ -122,7 +124,20 @@ def download():
                 block = file.read(block_size)
             file.close()
         if os.path.exists(compress_filepath):
-            os.remove(compress_filepath)
+            try:
+                os.remove(compress_filepath)
+            except PermissionError:
+                pass
+
+    # 保证压缩包一定会被删除
+    @current_app.after_response
+    def delete_compress_file():
+        if os.path.exists(compress_filepath):
+            try:
+                os.remove(compress_filepath)
+            except PermissionError:
+                pass
+        after_response.callbacks.pop()
 
     return current_app.response_class(read_file(), headers={
         'Content-Disposition': "attachment; filename={}; filename*=UTF-8''{}".format(
