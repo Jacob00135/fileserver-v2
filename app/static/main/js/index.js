@@ -462,15 +462,19 @@
                 quitMultiSelect();
             }
         });
-        document.querySelectorAll('#app .file-list .multi-select').forEach((input) => {
-            
+        document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)').forEach((item) => {
+            const input = item.querySelector('.multi-select');
+            input.addEventListener('change', (e) => {
+                if (input.checked) {
+                    item.setAttribute('data-active', '1');
+                } else {
+                    item.setAttribute('data-active', '0');
+                }
+            });
         });
 
         function startMultiSelect() {
-            document.querySelectorAll('#app .file-list .list-group-item').forEach((item) => {
-                // 不对上一级链接进行操作
-                if (item.getAttribute('data-upper-path')) return undefined;
-
+            document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)').forEach((item) => {
                 const input = item.querySelector('.multi-select');
                 const a = item.querySelector('.file-name');
 
@@ -480,22 +484,38 @@
 
                 // 显示所有的多选框
                 input.classList.remove('d-none');
+
+                // 取消选择
+                if (input.checked) {
+                    input.click();
+                }
+
+                // 为文件链接添加复选框点击事件
+                a.selectEvent = (e) => {
+                    input.click();
+                };
+                a.addEventListener('click', a.selectEvent);
             });
         }
 
         function quitMultiSelect() {
-            document.querySelectorAll('#app .file-list .list-group-item').forEach((item) => {
-                // 不对上一级链接进行操作
-                if (item.getAttribute('data-upper-path')) return undefined;
-
+            document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)').forEach((item) => {
                 const input = item.querySelector('.multi-select');
                 const a = item.querySelector('.file-name');
+
+                // 取消选择
+                if (input.checked) {
+                    input.click();
+                }
 
                 // 隐藏所有多选框
                 input.classList.add('d-none');
 
                 // 添加文件链接
                 a.setAttribute('href', hrefArr.shift());
+
+                // 移除文件链接的复选框点击事件
+                a.removeEventListener('click', a.selectEvent);
             });
         }
 

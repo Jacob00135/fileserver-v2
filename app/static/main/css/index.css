@@ -8,10 +8,10 @@
   color: #A5ACBA !important;
 }
 
-#app .file-list .list-group-item:hover {
+#app .file-list .list-group-item:hover, #app .file-list .list-group-item[data-active="1"] {
   background-color: #212529 !important;
 }
-#app .file-list .list-group-item:hover .file-name {
+#app .file-list .list-group-item .file-name {
   cursor: pointer;
 }
 #app .file-list .bi[data-file-type=dir] {

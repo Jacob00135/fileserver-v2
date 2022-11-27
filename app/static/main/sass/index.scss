@@ -13,8 +13,12 @@
 }
 
 #app .file-list {
-    .list-group-item:hover {
-        background-color: $bg-dark !important;
+    .list-group-item {
+
+        &:hover,
+        &[data-active="1"] {
+            background-color: $bg-dark !important;
+        }
 
         .file-name {
             cursor: pointer;
