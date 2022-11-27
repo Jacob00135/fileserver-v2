@@ -15,6 +15,10 @@
 #app .file-list {
     .list-group-item:hover {
         background-color: $bg-dark !important;
+
+        .file-name {
+            cursor: pointer;
+        }
     }
 
     @for $i from 1 through 7 {
@@ -96,5 +100,13 @@
             content: "\F229";
         }
     }
+
     /* 展开、折叠图标样式 [end] */
+}
+
+#multi-select[data-multi-status="1"] {
+    border-color: #f8f9fa;
+    box-shadow: 0 0 0 0.25rem rgb(248 249 250 / 50%);
+    background-color: #f8f9fa;
+    color: #000;
 }

@@ -4,7 +4,7 @@
 {% block title %}文件系统{% endblock title %}
 
 {% block style %}
-    <link rel="stylesheet" href="/static/main/css/index.css" />
+    <link rel="stylesheet" href="/static/main/css/index.css"/>
 {% endblock style %}
 
 {% block modal %}
@@ -465,187 +465,202 @@
 {% endblock modal %}
 
 {% block content %}
-<h1 class="text-white text-center my-4">文件系统</h1>
-<div class="row">
-    <div class="col px-0">
+    <h1 class="text-white text-center my-4">文件系统</h1>
+    <div class="row">
+        <div class="col px-0">
 
-        <!-- 顶部操作按钮组 [start] -->
-        {% if not root_page and current_user.is_authenticated %}
-            <div class="btn-group d-block text-center mb-2 action-group" role="group">
-                <button type="button" class="btn btn-info rounded-2 gray-shadow" id="upload-file" data-bs-toggle="modal"
-                        data-bs-target="#upload-file-modal">
-                    上传文件
-                </button>
-                {% if current_user.is_admin() %}
-                    <button type="button" class="btn btn-info rounded-2 gray-shadow" id="create-dir"
-                            data-bs-toggle="modal" data-bs-target="#create-dir-modal">
-                        新建目录
+            <!-- 顶部操作按钮组 [start] -->
+            {% if not root_page and current_user.is_authenticated %}
+                <div class="btn-group d-block text-center mb-2 action-group" role="group">
+
+                    <!-- 上传文件按钮 [start] -->
+                    <button type="button" class="btn btn-info rounded-2 gray-shadow" id="upload-file"
+                            data-bs-toggle="modal" data-bs-target="#upload-file-modal">
+                        上传文件
                     </button>
-                {% endif %}
-            </div>
-        {% endif %}
-        <!-- 顶部操作按钮组 [end] -->
+                    <!-- 上传文件按钮 [end] -->
 
-        <!-- 路径导航 [start] -->
-        {% if not root_page %}
-            <div class="d-flex mb-1">
-                <!-- 复制按钮 -->
-                <button type="button" class="btn btn-dark no-shadow px-2 py-1 ms-0 ms-sm-2" id="copy-current-dir-path"
-                        title="复制" data-current-dir-path="{{ current_dir_path }}">
-                    <i class="bi bi-clipboard copy-icon"></i>
-                </button>
-
-                <!-- 导航项目 [start] -->
-                <nav class="ps-2 pe-2 pe-sm-4 dir-path-nav" aria-label="breadcrumb">
-                    <ol class="breadcrumb my-1">
-                        {# 从最后一个遍历到第一个 [start] #}
-                        {% with %}
-                            {% set nav_path_length = nav_path | length %}
-                            {% for i in range(nav_path_length - 1) %}
-                                {% set name, path = nav_path[nav_path_length - i - 1] %}
-                                <li class="breadcrumb-item">
-                                    <a class="text-light dir-path-link"
-                                       href="{{ url_for('main.index', path=path) }}">{{ name }}</a>
-                                </li>
-                            {% endfor %}
-                        {% endwith %}
-                        {# 从最后一个遍历到第一个 [end] #}
-
-                        <!-- 当前页面 -->
-                        <li class="breadcrumb-item active" aria-current="page">
-                            {{ nav_path[0][0] }}
-                        </li>
-
-                    </ol>
-                </nav>
-                <!-- 导航项目 [end] -->
-
-            </div>
-        {% endif %}
-        <!-- 路径导航 [end] -->
-
-        <!-- 文件列表 [start] -->
-        <ul class="list-group mb-5 shadow file-list">
-
-            <!-- 上一级 [start] -->
-            {% if not root_page %}
-                <li class="list-group-item bg-secondary d-flex justify-content-between p-0 upper-path">
-                    <a class="text-light text-truncate flex-fill text-decoration-none px-2 px-sm-4 py-2 file-name"
-                       href="{{ url_for('main.index', path=upper_path) }}">
-                        上一级
-                    </a>
-                </li>
-            {% endif %}
-            <!-- 上一级 [end] -->
-
-            <!-- 每一个用户行 [start] -->
-            {% for file in file_list %}
-                <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4 py-0">
-
-                    <!-- 多选复选框 -->
-                    <input class="form-check-input mt-0 me-2 text-truncate align-self-center d-none" type="checkbox"
-                           name="file-name" value="{{ file.path }}"/>
-
-                    <!-- 文件类型图标 -->
-                    <i class="{{ file_type_icon_map[file.type] }} mt-0 me-2 align-self-center fs-3 text-light"
-                       data-file-type="{{ file.type }}"></i>
-
-                    <!-- 显示文件名的区域 -->
-                    <a class="text-light text-truncate flex-fill text-decoration-none py-2 file-name"
-                       href="{{ url_for('main.index', path=file.path) }}" title="{{ file.name }}"
-                       {% if file.type != 'dir' %}target="_blank"{% endif %}>
-                        {% if root_page %}
-                            {{ file.path }}
-                        {% else %}
-                            {{ file.name }}
-                        {% endif %}
-                    </a>
-
-                    <!-- 显示文件大小的区域 -->
-                    <span class="text-light py-2 file-size{% if file.size != '' %} ms-2{% endif %}">{{ file.size }}</span>
-
-                    <!-- 操作下拉菜单 [start] -->
-                    <div class="dropdown action-dropdown d-flex">
-
-                        <!-- 折叠、展开按钮 -->
-                        <button class="btn btn-dark dropdown-toggle ms-2 align-self-center no-shadow border border-secondary"
-                                type="button" id="action-dropdown-btn-{{ loop.index0 }}" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                    <!-- 新建目录按钮 [start] -->
+                    {% if current_user.is_admin() %}
+                        <button type="button" class="btn btn-info rounded-2 gray-shadow" id="create-dir"
+                                data-bs-toggle="modal" data-bs-target="#create-dir-modal">
+                            新建目录
                         </button>
+                    {% endif %}
+                    <!-- 新建目录按钮 [end] -->
 
-                        <!-- 操作按钮列表 [start] -->
-                        <ul class="dropdown-menu dropdown-menu-dark">
+                    <!-- 多选按钮 [start] -->
+                    <button type="button" class="btn btn-outline-light rounded-2 ms-2" id="multi-select"
+                            data-multi-status="0">
+                        多选
+                    </button>
+                    <!-- 多选按钮 [end] -->
 
-                            <!-- 预览目录按钮 [start] -->
-                            {% if file.type == 'dir' %}
-                                <li>
-                                    <a class="dropdown-item preview-dir" href="javascript:;"
-                                       data-href="{{ url_for('main.preview_dir', path=file.path) }}">预览</a>
-                                </li>
-                            {% endif %}
-                            <!-- 预览目录按钮 [end] -->
+                </div>
+            {% endif %}
+            <!-- 顶部操作按钮组 [end] -->
 
-                            <!-- 下载按钮 [start] -->
-                            <li>
-                                <a class="dropdown-item{% if file.type == 'dir' %} download-dir{% endif %}"
-                                   href="{{ url_for('main.download', path=file.path) }}">下载</a>
+            <!-- 路径导航 [start] -->
+            {% if not root_page %}
+                <div class="d-flex mb-1">
+                    <!-- 复制按钮 -->
+                    <button type="button" class="btn btn-dark no-shadow px-2 py-1 ms-0 ms-sm-2"
+                            id="copy-current-dir-path"
+                            title="复制" data-current-dir-path="{{ current_dir_path }}">
+                        <i class="bi bi-clipboard copy-icon"></i>
+                    </button>
+
+                    <!-- 导航项目 [start] -->
+                    <nav class="ps-2 pe-2 pe-sm-4 dir-path-nav" aria-label="breadcrumb">
+                        <ol class="breadcrumb my-1">
+                            {# 从最后一个遍历到第一个 [start] #}
+                            {% with %}
+                                {% set nav_path_length = nav_path | length %}
+                                {% for i in range(nav_path_length - 1) %}
+                                    {% set name, path = nav_path[nav_path_length - i - 1] %}
+                                    <li class="breadcrumb-item">
+                                        <a class="text-light dir-path-link"
+                                           href="{{ url_for('main.index', path=path) }}">{{ name }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% endwith %}
+                            {# 从最后一个遍历到第一个 [end] #}
+
+                            <!-- 当前页面 -->
+                            <li class="breadcrumb-item active" aria-current="page">
+                                {{ nav_path[0][0] }}
                             </li>
-                            <!-- 下载按钮 [start] -->
 
-                            <!-- 查看完整文件名 [start] -->
-                            <li>
-                                <a class="dropdown-item full-file-name" href="javascript:;"
-                                   data-file-name="{% if root_page %}{{ file.path }}{% else %}{{ file.name }}{% endif %}">查看完整文件名</a>
-                            </li>
-                            <!-- 查看完整文件名 [end] -->
+                        </ol>
+                    </nav>
+                    <!-- 导航项目 [end] -->
 
-                            <!-- 查看目录大小按钮 [start] -->
-                            {% if file.type == 'dir' and current_user.is_authenticated %}
-                                <li>
-                                    <a class="dropdown-item dir-size" href="javascript:;"
-                                       data-href="{{ url_for('main.dir_size', path=file.path) }}"
-                                       data-file-name="{{ file.name }}">查看目录大小</a>
-                                </li>
+                </div>
+            {% endif %}
+            <!-- 路径导航 [end] -->
+
+            <!-- 文件列表 [start] -->
+            <ul class="list-group mb-5 shadow file-list">
+
+                <!-- 上一级 [start] -->
+                {% if not root_page %}
+                    <li class="list-group-item bg-secondary d-flex justify-content-between p-0 upper-path" data-upper-path="1">
+                        <a class="text-light text-truncate flex-fill text-decoration-none px-2 px-sm-4 py-2 file-name"
+                           href="{{ url_for('main.index', path=upper_path) }}">
+                            上一级
+                        </a>
+                    </li>
+                {% endif %}
+                <!-- 上一级 [end] -->
+
+                <!-- 每一个文件行 [start] -->
+                {% for file in file_list %}
+                    <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4 py-0">
+
+                        <!-- 多选复选框 -->
+                        <input class="form-check-input mt-0 me-2 align-self-center d-none multi-select" type="checkbox"
+                               name="file-name" value="{{ file.path }}"/>
+
+                        <!-- 文件类型图标 -->
+                        <i class="{{ file_type_icon_map[file.type] }} mt-0 me-2 align-self-center fs-3 text-light"
+                           data-file-type="{{ file.type }}"></i>
+
+                        <!-- 显示文件名的区域 -->
+                        <a class="text-light text-truncate flex-fill text-decoration-none py-2 file-name"
+                           href="{{ url_for('main.index', path=file.path) }}" title="{{ file.name }}"
+                           {% if file.type !='dir' %}target="_blank"{% endif %}>
+                            {% if root_page %}
+                                {{ file.path }}
+                            {% else %}
+                                {{ file.name }}
                             {% endif %}
-                            <!-- 查看目录大小按钮 [end] -->
+                        </a>
 
-                            {% if current_user.is_admin() and not root_page %}
+                        <!-- 显示文件大小的区域 -->
+                        <span class="text-light py-2 file-size{% if file.size != '' %} ms-2{% endif %}">{{ file.size }}</span>
+
+                        <!-- 操作下拉菜单 [start] -->
+                        <div class="dropdown action-dropdown d-flex">
+
+                            <!-- 折叠、展开按钮 -->
+                            <button class="btn btn-dark dropdown-toggle ms-2 align-self-center no-shadow border border-secondary"
+                                    type="button" id="action-dropdown-btn-{{ loop.index0 }}" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                            </button>
+
+                            <!-- 操作按钮列表 [start] -->
+                            <ul class="dropdown-menu dropdown-menu-dark">
+
+                                <!-- 预览目录按钮 [start] -->
+                                {% if file.type == 'dir' %}
+                                    <li>
+                                        <a class="dropdown-item preview-dir" href="javascript:;"
+                                           data-href="{{ url_for('main.preview_dir', path=file.path) }}">预览</a>
+                                    </li>
+                                {% endif %}
+                                <!-- 预览目录按钮 [end] -->
+                                <!-- 下载按钮 [start] -->
                                 <li>
-                                    <a class="dropdown-item copy" href="javascript:;" data-file-path="{{ file.path }}">复制</a>
+                                    <a class="dropdown-item{% if file.type == 'dir' %} download-dir{% endif %}"
+                                       href="{{ url_for('main.download', path=file.path) }}">下载</a>
                                 </li>
+                                <!-- 下载按钮 [start] -->
+                                <!-- 查看完整文件名 [start] -->
                                 <li>
-                                    <a class="dropdown-item move" href="javascript:;" data-file-path="{{ file.path }}">移动</a>
+                                    <a class="dropdown-item full-file-name" href="javascript:;"
+                                       data-file-name="
+                                               {% if root_page %}{{ file.path }}{% else %}{{ file.name }}{% endif %}">查看完整文件名</a>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item remove" href="javascript:;"
-                                       data-file-path="{{ file.path }}" data-file-name="{{ file.name }}">删除</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item rename" href="javascript:;" data-file-path="{{ file.path }}"
-                                       data-file-name="{{ file.name }}">重命名</a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                        <!-- 操作按钮列表 [end] -->
+                                <!-- 查看完整文件名 [end] -->
+                                <!-- 查看目录大小按钮 [start] -->
+                                {% if file.type == 'dir' and current_user.is_authenticated %}
+                                    <li>
+                                        <a class="dropdown-item dir-size" href="javascript:;"
+                                           data-href="{{ url_for('main.dir_size', path=file.path) }}"
+                                           data-file-name="{{ file.name }}">查看目录大小</a>
+                                    </li>
+                                {% endif %}
+                                <!-- 查看目录大小按钮 [end] -->
+                                {% if current_user.is_admin() and not root_page %}
+                                    <li>
+                                        <a class="dropdown-item copy" href="javascript:;"
+                                           data-file-path="{{ file.path }}">复制</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item move" href="javascript:;"
+                                           data-file-path="{{ file.path }}">移动</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item remove" href="javascript:;"
+                                           data-file-path="{{ file.path }}" data-file-name="{{ file.name }}">删除</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rename" href="javascript:;"
+                                           data-file-path="{{ file.path }}"
+                                           data-file-name="{{ file.name }}">重命名</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                            <!-- 操作按钮列表 [end] -->
 
-                    </div>
-                    <!-- 操作下拉菜单 [end] -->
+                        </div>
+                        <!-- 操作下拉菜单 [end] -->
 
-                </li>
-            {% endfor %}
-            <!-- 每一个用户行 [end] -->
+                    </li>
+                {% endfor %}
+                <!-- 每一个文件行 [end] -->
 
-        </ul>
-        <!-- 文件列表 [end] -->
+            </ul>
+            <!-- 文件列表 [end] -->
 
-        <!-- 当没有可见目录可显示时要显示的内容 [start] -->
-        {% if not file_list %}
-            <p class="text-light text-center fs-5 my-5">没有文件</p>
-        {% endif %}
-        <!-- 当没有可见目录可显示时要显示的内容 [end] -->
+            <!-- 当没有可见目录可显示时要显示的内容 [start] -->
+            {% if not file_list %}
+                <p class="text-light text-center fs-5 my-5">没有文件</p>
+            {% endif %}
+            <!-- 当没有可见目录可显示时要显示的内容 [end] -->
 
+        </div>
     </div>
-</div>
 {% endblock content %}
 
 {% block javascript %}

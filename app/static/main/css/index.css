@@ -11,6 +11,9 @@
 #app .file-list .list-group-item:hover {
   background-color: #212529 !important;
 }
+#app .file-list .list-group-item:hover .file-name {
+  cursor: pointer;
+}
 #app .file-list .bi[data-file-type=dir] {
   color: #ffdc78 !important;
 }
@@ -113,6 +116,13 @@
 }
 #preview-dir-modal .struct .item[data-type=dir][data-fold="0"]::before {
   content: "\f229";
+}
+
+#multi-select[data-multi-status="1"] {
+  border-color: #f8f9fa;
+  box-shadow: 0 0 0 0.25rem rgba(248, 249, 250, 0.5);
+  background-color: #f8f9fa;
+  color: #000;
 }
 
 /*# sourceMappingURL=index.css.map */

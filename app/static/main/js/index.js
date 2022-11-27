@@ -447,4 +447,58 @@
         });
     })();
 
+    // 多选
+    (() => {
+        const btn = document.getElementById('multi-select');
+        if (!btn) return undefined;
+        const hrefArr = [];
+
+        btn.addEventListener('click', (e) => {
+            if (btn.getAttribute('data-multi-status') === '0') {
+                btn.setAttribute('data-multi-status', '1');
+                startMultiSelect();
+            } else {
+                btn.setAttribute('data-multi-status', '0');
+                quitMultiSelect();
+            }
+        });
+        document.querySelectorAll('#app .file-list .multi-select').forEach((input) => {
+            
+        });
+
+        function startMultiSelect() {
+            document.querySelectorAll('#app .file-list .list-group-item').forEach((item) => {
+                // 不对上一级链接进行操作
+                if (item.getAttribute('data-upper-path')) return undefined;
+
+                const input = item.querySelector('.multi-select');
+                const a = item.querySelector('.file-name');
+
+                // 移除所有文件链接，同时把链接暂时保存到数组
+                hrefArr.push(a.getAttribute('href'));
+                a.removeAttribute('href');
+
+                // 显示所有的多选框
+                input.classList.remove('d-none');
+            });
+        }
+
+        function quitMultiSelect() {
+            document.querySelectorAll('#app .file-list .list-group-item').forEach((item) => {
+                // 不对上一级链接进行操作
+                if (item.getAttribute('data-upper-path')) return undefined;
+
+                const input = item.querySelector('.multi-select');
+                const a = item.querySelector('.file-name');
+
+                // 隐藏所有多选框
+                input.classList.add('d-none');
+
+                // 添加文件链接
+                a.setAttribute('href', hrefArr.shift());
+            });
+        }
+
+    })();
+
 })(window, document);
