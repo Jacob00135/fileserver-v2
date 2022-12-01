@@ -8,7 +8,8 @@
   color: #A5ACBA !important;
 }
 
-#app .file-list .list-group-item:hover, #app .file-list .list-group-item[data-active="1"] {
+#app .file-list:not([data-multi-select-status="1"]) .list-group-item:hover,
+#app .file-list .list-group-item[data-active="1"] {
   background-color: #212529 !important;
 }
 #app .file-list .list-group-item .file-name {
@@ -118,11 +119,22 @@
   content: "\f229";
 }
 
-#multi-select[data-multi-status="1"] {
+#app .multi-select-btn-group {
+  /* 多选按钮 [start] */
+  /* 多选按钮 [end] */
+  /* 多选操作的下拉按钮 */
+}
+#app .multi-select-btn-group #multi-select[data-multi-status="1"] {
   border-color: #f8f9fa;
-  box-shadow: 0 0 0 0.25rem rgba(248, 249, 250, 0.5);
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  box-shadow: 0 0 0 0 #00000000;
   background-color: #f8f9fa;
   color: #000;
+}
+#app .multi-select-btn-group #multi-select-dropdown-btn {
+  border-left-color: #212529 !important;
+  box-shadow: 0 0 0 0 #00000000;
 }
 
 /*# sourceMappingURL=index.css.map */

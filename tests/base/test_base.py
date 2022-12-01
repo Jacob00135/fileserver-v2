@@ -3,12 +3,13 @@ import unittest
 import sqlite3
 from werkzeug.test import TestResponse
 from flask import current_app, url_for
-from config import TestingConfig
+from config import BASE_PATH, TestingConfig
 from app import create_app, db
 from app.model import Users
 
 
 class BaseUnittestCase(unittest.TestCase):
+    test_dir_path = os.path.realpath(os.path.join(BASE_PATH, 'tests/test_file'))
 
     def setUp(self) -> None:
         self.app = create_app('testing')

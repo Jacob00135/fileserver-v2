@@ -474,6 +474,10 @@
         });
 
         function startMultiSelect() {
+            // 进入多选状态
+            document.querySelector('#app .file-list').setAttribute('data-multi-select-status', '1');
+
+            // 操作列表项
             document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)').forEach((item) => {
                 const input = item.querySelector('.multi-select');
                 const a = item.querySelector('.file-name');
@@ -496,9 +500,19 @@
                 };
                 a.addEventListener('click', a.selectEvent);
             });
+
+            // 显示多选操作下拉按钮
+            document.getElementById('multi-select-dropdown-btn').classList.remove('d-none');
         }
 
         function quitMultiSelect() {
+            // 隐藏多选操作下拉按钮
+            document.getElementById('multi-select-dropdown-btn').classList.add('d-none');
+
+            // 退出多选状态
+            document.querySelector('#app .file-list').setAttribute('data-multi-select-status', '0');
+
+            // 操作列表项
             document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)').forEach((item) => {
                 const input = item.querySelector('.multi-select');
                 const a = item.querySelector('.file-name');
@@ -519,6 +533,30 @@
             });
         }
 
+    })();
+
+    // 多选删除
+    (() => {
+        const btn = document.querySelector('.multi-select-btn-group .remove');
+        if (!btn) return undefined;
+        const modal = document.getElementById('delete-multi-file-modal');
+
+        btn.addEventListener('click', (e) => {
+            // 收集要删除的文件的路径
+            const htmlList = [];
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]').forEach((input) => {
+                const html = `<span class="bg-danger bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
+                    <br/>
+                    <input class="d-none" type="text" name="path" value="{{ file-path }}" required="required"/>`
+                    .replace(/\{\{ file-path }}/g, input.value);
+                htmlList.push(html);
+            });
+            if (htmlList.length <= 0) return undefined;
+
+            // 显示模态框
+            modal.querySelector('.file-path-list').innerHTML = htmlList.join('');
+            (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
     })();
 
 })(window, document);

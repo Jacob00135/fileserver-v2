@@ -16,7 +16,7 @@ class DirActionTestCase(BaseUnittestCase):
         generate_visible_dir()
 
         # 生成测试目录
-        self.test_dirname = 'test_dir'
+        self.test_dirname = 'test_file'
         self.test_sub_dirname = 'sub_dir'
         self.test_filename_1 = 'test1.txt'
         self.test_filename_2 = 'test2.txt'

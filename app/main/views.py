@@ -151,29 +151,44 @@ def download():
 @main.route('/remove', methods=['POST'])
 @admin_required
 def remove():
-    # 检查参数
-    path = request.form.get('path', '', type=str)
-    if not check_path_query_param(path):
+    path_list = request.form.getlist('path')
+    if not path_list:
         abort(404)
-    path = os.path.realpath(path)
 
-    # 要删除的是一个文件
-    dir_path = os.path.dirname(path)
-    if os.path.isfile(path):
-        try:
-            os.remove(path)
-        except Exception as e:
-            flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
-        return redirect(url_for('main.index', path=dir_path))
+    # 只要有一个不合法，就都不进行操作
+    remove_path_list = []
+    dir_path = os.path.dirname(path_list[0])
+    for path in path_list:
+        # 检查参数
+        if not check_path_query_param(path):
+            abort(404)
+        path = os.path.realpath(path)
 
-    # 要删除的是整个目录
-    if VisibleDir.query.filter_by(dir_path=path).first() is not None or os.path.ismount(path):
-        flash(ErrorInfo.REMOVE_ROOT)
-        return redirect(url_for('main.index', path=dir_path))
-    try:
-        shutil.rmtree(path)
-    except Exception as e:
-        flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
+        # 要删除的是一个文件
+        if os.path.isfile(path):
+            remove_path_list.append(('file', path))
+            continue
+
+        # 要删除的是整个目录
+        if VisibleDir.query.filter_by(dir_path=path).first() is not None or os.path.ismount(path):
+            flash(ErrorInfo.REMOVE_ROOT)
+            return redirect(url_for('main.index', path=dir_path))
+        remove_path_list.append(('dir', path))
+
+    # 逐个删除
+    for file_type, path in remove_path_list:
+        if file_type == 'file':
+            try:
+                os.remove(path)
+            except Exception as e:
+                flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
+                return redirect(url_for('main.index', path=dir_path))
+        else:
+            try:
+                shutil.rmtree(path)
+            except Exception as e:
+                flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
+                return redirect(url_for('main.index', path=dir_path))
     return redirect(url_for('main.index', path=dir_path))
 
 

@@ -239,7 +239,7 @@ class FileActionTestCase(BaseUnittestCase):
     def test_create_dir_forbidden(self):
         """创建目录：无权限"""
         # 匿名用户请求
-        dir_name = 'test_dir'
+        dir_name = 'test_file'
         dir_path = os.path.abspath(os.path.join(BASE_PATH, dir_name))
         response = self.client.post(
             self.url_for('main.create_dir'),
@@ -284,7 +284,7 @@ class FileActionTestCase(BaseUnittestCase):
     def test_create_dir(self):
         """创建目录成功"""
         self.login('admin', '123456')
-        dir_name = 'test_dir'
+        dir_name = 'test_file'
         dir_path = os.path.abspath(os.path.join(BASE_PATH, dir_name))
         response = self.client.post(
             self.url_for('main.create_dir'),
