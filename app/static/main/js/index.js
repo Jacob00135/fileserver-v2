@@ -447,12 +447,15 @@
         });
     })();
 
-    // 多选
+    // 多选按钮
     (() => {
         const btn = document.getElementById('multi-select');
         if (!btn) return undefined;
+        const topNode = document.querySelector('#app .file-list');
+        const fileList = document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)');
         const hrefArr = [];
 
+        // 多选按钮点击事件
         btn.addEventListener('click', (e) => {
             if (btn.getAttribute('data-multi-status') === '0') {
                 btn.setAttribute('data-multi-status', '1');
@@ -462,13 +465,28 @@
                 quitMultiSelect();
             }
         });
-        document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)').forEach((item) => {
+
+        // 勾选多选框事件
+        fileList.forEach((item) => {
+            const index = item.getAttribute('data-index');
             const input = item.querySelector('.multi-select');
             input.addEventListener('change', (e) => {
                 if (input.checked) {
                     item.setAttribute('data-active', '1');
+
+                    // 设置区间选择的起始和结束下标
+                    if (topNode.getAttribute('data-select-start-index') === '-1') {
+                        topNode.setAttribute('data-select-start-index', index);
+                    } else if (topNode.getAttribute('data-select-end-index') === '-1') {
+                        topNode.setAttribute('data-select-end-index', index);
+                    } else {
+                        topNode.setAttribute('data-select-start-index', topNode.getAttribute('data-select-end-index'));
+                        topNode.setAttribute('data-select-end-index', index);
+                    }
                 } else {
                     item.setAttribute('data-active', '0');
+                    topNode.setAttribute('data-select-start-index', '-1');
+                    topNode.setAttribute('data-select-end-index', '-1');
                 }
             });
         });
@@ -476,9 +494,14 @@
         function startMultiSelect() {
             // 进入多选状态
             document.querySelector('#app .file-list').setAttribute('data-multi-select-status', '1');
+            document.querySelector('#app .secondary-multi-select-btn-group').classList.remove('d-none');
+
+            // 重置区间选择的起始、结束下标
+            topNode.setAttribute('data-select-start-index', '-1');
+            topNode.setAttribute('data-select-end-index', '-1');
 
             // 操作列表项
-            document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)').forEach((item) => {
+            fileList.forEach((item) => {
                 const input = item.querySelector('.multi-select');
                 const a = item.querySelector('.file-name');
 
@@ -511,9 +534,10 @@
 
             // 退出多选状态
             document.querySelector('#app .file-list').setAttribute('data-multi-select-status', '0');
+            document.querySelector('#app .secondary-multi-select-btn-group').classList.add('d-none');
 
             // 操作列表项
-            document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)').forEach((item) => {
+            fileList.forEach((item) => {
                 const input = item.querySelector('.multi-select');
                 const a = item.querySelector('.file-name');
 
@@ -533,6 +557,73 @@
             });
         }
 
+    })();
+
+    // 多选辅助：全选、全不选、反选、区间选择
+    (() => {
+        const topNode = document.querySelector('#app .file-list');
+        const fileList = document.querySelectorAll('#app .file-list .list-group-item:not(.upper-path)');
+        const allSelectBtn = document.querySelector('.secondary-multi-select-btn-group .all-select');
+        const noSelectBtn = document.querySelector('.secondary-multi-select-btn-group .no-select');
+        const antiSelectBtn = document.querySelector('.secondary-multi-select-btn-group .anti-select');
+        const betweenSelectBtn = document.querySelector('.secondary-multi-select-btn-group .between-select');
+
+        if (allSelectBtn) {
+            allSelectBtn.addEventListener('click', (e) => {
+                fileList.forEach((item) => {
+                    if (item.getAttribute('data-active') !== '1') {
+                        item.querySelector('input[name="file-name"]').click();
+                    }
+                });
+                topNode.setAttribute('data-select-start-index', '-1');
+                topNode.setAttribute('data-select-end-index', '-1');
+            });
+        }
+
+        if (noSelectBtn) {
+            noSelectBtn.addEventListener('click', (e) => {
+                fileList.forEach((item) => {
+                    if (item.getAttribute('data-active') === '1') {
+                        item.querySelector('input[name="file-name"]').click();
+                    }
+                });
+                topNode.setAttribute('data-select-start-index', '-1');
+                topNode.setAttribute('data-select-end-index', '-1');
+            });
+        }
+
+        if (antiSelectBtn) {
+            antiSelectBtn.addEventListener('click', (e) => {
+                fileList.forEach((item) => {
+                    item.querySelector('input[name="file-name"]').click();
+                });
+                topNode.setAttribute('data-select-start-index', '-1');
+                topNode.setAttribute('data-select-end-index', '-1');
+            });
+        }
+
+        if (betweenSelectBtn) {
+            betweenSelectBtn.addEventListener('click', (e) => {
+                let start = parseInt(topNode.getAttribute('data-select-start-index'));
+                let end = parseInt(topNode.getAttribute('data-select-end-index'));
+                if (start === -1 || end === -1) return undefined;
+
+                if (start > end) {
+                    const t = start;
+                    start = end;
+                    end = t;
+                }
+
+                for (let i = start + 1; i < end; i++) {
+                    if (fileList[i].getAttribute('data-active') !== '1') {
+                        fileList[i].querySelector('.file-name').click();
+                    }
+                }
+
+                topNode.setAttribute('data-select-start-index', '-1');
+                topNode.setAttribute('data-select-end-index', '-1');
+            });
+        }
     })();
 
     // 多选删除

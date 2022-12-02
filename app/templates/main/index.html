@@ -511,14 +511,16 @@
         <div class="col px-0">
 
             <!-- 顶部操作按钮组 [start] -->
-            {% if not root_page and current_user.is_authenticated %}
+            {% if not root_page %}
                 <div class="btn-group d-block text-center mb-2 action-group" role="group">
 
                     <!-- 上传文件按钮 [start] -->
-                    <button type="button" class="btn btn-info rounded-2 gray-shadow" id="upload-file"
+                    {% if current_user.is_authenticated %}
+                        <button type="button" class="btn btn-info rounded-2 gray-shadow" id="upload-file"
                             data-bs-toggle="modal" data-bs-target="#upload-file-modal">
                         上传文件
                     </button>
+                    {% endif %}
                     <!-- 上传文件按钮 [end] -->
 
                     <!-- 新建目录按钮 [start] -->
@@ -541,7 +543,7 @@
                         <!-- 多选按钮 [end] -->
 
                         <!-- 下拉按钮 [start] -->
-                        <button type="button" class="btn btn-outline-light dropdown-toggle dropdown-toggle-split px-3 d-none"
+                        <button type="button" class="btn btn-outline-light dropdown-toggle dropdown-toggle-split px-3 rounded-end d-none"
                                 data-bs-toggle="dropdown" aria-expanded="false" id="multi-select-dropdown-btn">
                             <span class="visually-hidden">Toggle Dropdown</span>
                         </button>
@@ -563,6 +565,15 @@
 
                     </div>
                     <!-- 多选按钮及操作下拉菜单 [end] -->
+
+                    <!-- 多选辅助按钮 [start] -->
+                    <div class="btn-group d-block mt-2 d-none secondary-multi-select-btn-group">
+                        <button type="button" class="btn btn-info rounded-2 gray-shadow all-select">全选</button>
+                        <button type="button" class="btn btn-info rounded-2 gray-shadow no-select">全不选</button>
+                        <button type="button" class="btn btn-info rounded-2 gray-shadow anti-select">反选</button>
+                        <button type="button" class="btn btn-info rounded-2 gray-shadow between-select">区间选择</button>
+                    </div>
+                    <!-- 多选辅助按钮 [end] -->
 
                 </div>
             {% endif %}
@@ -608,7 +619,7 @@
             <!-- 路径导航 [end] -->
 
             <!-- 文件列表 [start] -->
-            <ul class="list-group mb-5 shadow file-list">
+            <ul class="list-group mb-5 shadow file-list" data-select-start-index="-1" data-select-end-index="-1">
 
                 <!-- 上一级 [start] -->
                 {% if not root_page %}
@@ -624,7 +635,7 @@
                 <!-- 每一个文件行 [start] -->
                 {% for file in file_list %}
                     <li class="list-group-item bg-secondary d-flex justify-content-between px-2 px-sm-4 py-0"
-                        data-multi-select-status="0">
+                        data-index="{{ loop.index0 }}">
 
                         <!-- 多选复选框 -->
                         <input class="form-check-input mt-0 me-2 align-self-center flex-shrink-0 d-none multi-select"
