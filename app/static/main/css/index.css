@@ -42,18 +42,6 @@
   cursor: text;
 }
 
-#app .file-list .action-dropdown [id^=action-dropdown-btn] {
-  height: 36px;
-  transition: all 0.15s;
-}
-#app .file-list .action-dropdown [id^=action-dropdown-btn]:hover, #app .file-list .action-dropdown [id^=action-dropdown-btn]:active, #app .file-list .action-dropdown [id^=action-dropdown-btn]:focus, #app .file-list .action-dropdown [id^=action-dropdown-btn].show {
-  background-color: #a5acba;
-  color: #212529;
-}
-#app .file-list .action-dropdown [id^=action-dropdown-btn]::after {
-  margin-left: 0;
-}
-
 #preview-dir-modal {
   /* 文件图标 */
   /* 展开、折叠图标样式 [start] */
@@ -117,6 +105,23 @@
 }
 #preview-dir-modal .struct .item[data-type=dir][data-fold="0"]::before {
   content: "\f229";
+}
+
+#app .file-list .action-dropdown [id^=action-dropdown-btn] {
+  height: 36px;
+  transition: all 0.15s;
+}
+#app .file-list .action-dropdown [id^=action-dropdown-btn]:hover, #app .file-list .action-dropdown [id^=action-dropdown-btn]:active, #app .file-list .action-dropdown [id^=action-dropdown-btn]:focus, #app .file-list .action-dropdown [id^=action-dropdown-btn].show {
+  background-color: #a5acba;
+  color: #212529;
+}
+#app .file-list .action-dropdown [id^=action-dropdown-btn]::after {
+  margin-left: 0;
+}
+
+#multi-total-size-modal .file-size-table .table [data-dir="1"] > td:first-child {
+  background-color: #25B4D3 !important;
+  --bs-table-accent-bg: none !important;
 }
 
 #app .multi-select-btn-group {

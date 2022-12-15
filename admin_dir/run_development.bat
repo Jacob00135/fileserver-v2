@@ -7,3 +7,12 @@ set FLASK_DEBUG=1
 set FLASK_CONFIG=development
 set FLASK_ADMIN_PASSWORD=123456
 flask run -h 0.0.0.0 -p 2333
+
+cd g:\FileServer
+.\venv\scripts\activate
+$env:FLASK_APP="file_server.py"
+$env:FLASK_ENV="development"
+$env:FLASK_DEBUG="1"
+$env:FLASK_CONFIG="development"
+$env:FLASK_ADMIN_PASSWORD="123456"
+flask.exe run -h 0.0.0.0 -p 2333

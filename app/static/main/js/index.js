@@ -47,6 +47,7 @@
     // 删除文件
     (() => {
         const modal = document.getElementById('delete-file-modal');
+        if (!modal) return undefined;
         const form = document.forms['delete-file'];
 
         document.querySelectorAll('#app .file-list .action-dropdown .remove').forEach((a) => {
@@ -61,6 +62,7 @@
     // 重命名文件
     (() => {
         const modal = document.getElementById('rename-file-modal');
+        if (!modal) return undefined;
         const form = document.forms['rename-file'];
 
         document.querySelectorAll('#app .file-list .action-dropdown .rename').forEach((a) => {
@@ -77,6 +79,7 @@
     // 移动文件
     (() => {
         const modal = document.getElementById('move-file-modal');
+        if (!modal) return undefined;
         const form = document.forms['move-file'];
         const filePathInput = form.querySelector('input[name="source-file-path"]');
 
@@ -91,6 +94,7 @@
     // 复制文件
     (() => {
         const modal = document.getElementById('copy-file-modal');
+        if (!modal) return undefined;
         const form = document.forms['copy-file'];
         const filePathInput = form.querySelector('input[name="source-file-path"]');
 
@@ -105,6 +109,7 @@
     // 上传文件
     (() => {
         const form = document.forms['upload-file'];
+        if (!form) return undefined;
         const fileInput = form.querySelector('input[name="file"]');
         const submitBtn = form.querySelector('[type="submit"]');
         const progressBox = form.querySelector('.progress');
@@ -410,6 +415,7 @@
     // 查看目录大小
     (() => {
         const modal = document.getElementById('dir-size-modal');
+        if (!modal) return undefined;
 
         document.querySelectorAll('#app .file-list .action-dropdown .dir-size').forEach((a) => {
             a.addEventListener('click', (e) => {
@@ -424,7 +430,7 @@
                 const url = a.getAttribute('data-href');
                 MyAJAX.getJson(url).then(
                     (data) => {
-                        modal.querySelector('.dir-info .size').textContent = data.result;
+                        modal.querySelector('.dir-info .size').textContent = data.result.total;
                         modal.querySelector('.loading').classList.add('d-none');
                         modal.querySelector('.dir-info').classList.remove('d-none');
                     },
@@ -647,6 +653,106 @@
             // 显示模态框
             modal.querySelector('.file-path-list').innerHTML = htmlList.join('');
             (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
+    })();
+
+    // 多选移动
+    (() => {
+        const btn = document.querySelector('.multi-select-btn-group .move');
+        if (!btn) return undefined;
+        const modal = document.getElementById('move-multi-file-modal');
+        btn.addEventListener('click', (e) => {
+            // 收集要移动的文件的路径
+            const htmlList = [];
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]').forEach((input) => {
+                const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
+                    <br/>
+                    <input class="d-none" type="text" name="source-file-path" value="{{ file-path }}" required="required"/>`
+                    .replace(/\{\{ file-path }}/g, input.value);
+                htmlList.push(html);
+            });
+            if (htmlList.length <= 0) return undefined;
+
+            // 显示模态框
+            modal.querySelector('.file-path-list').innerHTML = htmlList.join('');
+            (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
+    })();
+
+    // 多选复制
+    (() => {
+        const btn = document.querySelector('.multi-select-btn-group .copy');
+        if (!btn) return undefined;
+        const modal = document.getElementById('copy-multi-file-modal');
+
+        btn.addEventListener('click', (e) => {
+            // 收集要复制的文件的路径
+            const htmlList = [];
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]').forEach((input) => {
+                const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
+                    <br/>
+                    <input class="d-none" type="text" name="source-file-path" value="{{ file-path }}" required="required"/>`
+                    .replace(/\{\{ file-path }}/g, input.value);
+                htmlList.push(html);
+            });
+            if (htmlList.length <= 0) return undefined;
+
+            // 显示模态框
+            modal.querySelector('.file-path-list').innerHTML = htmlList.join('');
+            (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
+    })();
+
+    // 多选文件查看总大小
+    (() => {
+        const btn = document.querySelector('.multi-select-btn-group .total-size');
+        if (!btn) return undefined;
+        const modal = document.getElementById('multi-total-size-modal');
+
+        btn.addEventListener('click', (e) => {
+            // 收集文件路径信息
+            const fpList = [];
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]')
+            .forEach((input) => {
+                fpList.push(encodeURIComponent(input.value));
+            });
+            if (fpList.length <= 0) return undefined;
+
+            // 初始化模态框
+            modal.querySelector('.file-size-table').classList.add('d-none');
+            modal.querySelector('.file-size-table .table tbody').innerHTML = '';
+            modal.querySelector('.fail-info').classList.add('d-none');
+            modal.querySelector('.loading').classList.remove('d-none');
+            (new bootstrap.Modal(modal, {keyboard: false})).show();
+
+            // ajax请求大小
+            const url = btn.getAttribute('data-href') + '?path=' + fpList.join('&path=');
+            MyAJAX.getJson(url).then(
+                (data) => {
+                    modal.querySelector('.loading').classList.add('d-none');
+                    // 将data.result渲染到表格中
+                    const tbody = modal.querySelector('.file-size-table .table tbody');
+                    const trList = [];
+                    data.result['size_list'].forEach((item) => {
+                        const html = `<tr data-dir="{{ is_dir }}">
+                            <td>{{ file_name }}</td>
+                            <td>{{ file_size }}</td>
+                        </tr>`
+                            .replace('{{ is_dir }}', item['is_dir'])
+                            .replace('{{ file_name }}', item['file_name'])
+                            .replace('{{ file_size }}', item['file_size']);
+                        trList.push(html);
+                    });
+                    tbody.innerHTML = `<tr class="total"><td>总计</td><td></td></tr>` + trList.join('');
+                    tbody.querySelector('.total > td:nth-child(2)').innerHTML = data.result.total;
+                    modal.querySelector('.file-size-table').classList.remove('d-none');
+                },
+                (data) => {
+                    modal.querySelector('.fail-info .message').innerHTML = data.message;
+                    modal.querySelector('.loading').classList.add('d-none');
+                    modal.querySelector('.fail-info').classList.remove('d-none');
+                }
+            );
         });
     })();
 

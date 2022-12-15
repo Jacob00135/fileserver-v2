@@ -5,14 +5,26 @@ def connect(path1: str, path2: str, *args) -> str:
     return os.path.realpath(os.path.join(path1, path2, *args))
 
 
-def get_file_size(file_path: str or int) -> str:
-    # 检查参数
+def get_file_size(file_path: str or int, result: str = 'str') -> str or int:
+    # 检查参数，如果是文件/目录路径，则计算文件/目录大小
     if isinstance(file_path, str):
-        size = os.path.getsize(file_path)
+        if os.path.isfile(file_path):
+            size = os.path.getsize(file_path)
+        else:
+            size = 0
+            for father, dir_names, filenames in os.walk(file_path):
+                for filename in filenames:
+                    size = size + os.path.getsize(os.path.join(father, filename))
     elif isinstance(file_path, int):
         size = file_path
     else:
         raise ValueError('file_path参数类型只能是`str`或`int`！')
+
+    # 检查返回值类型
+    if result == 'int':
+        return size
+    elif result != 'str':
+        raise ValueError('result参数只能是`str`或`int`')
 
     # 计算大小
     unit_list = ['B', 'KB', 'MB', 'GB', 'TB']

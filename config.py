@@ -79,6 +79,7 @@ class ErrorInfo(object):
     # 删除文件相关
     REMOVE_UNKNOWN = '删除失败：{}'
     REMOVE_ROOT = '不能删除根目录或可见目录！'
+    REMOVE_NO_PATH = '没有选择要删除的文件'
 
     # 文件重命名相关
     RENAME_NEW_FILENAME_ILLEGAL = '新名称不能包含\\/:*?"<>|'
@@ -94,6 +95,7 @@ class ErrorInfo(object):
     MOVE_TARGET_EXISTS_FILE = '目标路径已存在同名文件！'
     MOVE_UNKNOWN = '移动失败：{}'
     MOVE_ROOT = '不能移动根目录或可见目录！'
+    MOVE_NO_PATH = '没有选择要移动的文件'
 
     # 复制文件相关
     COPY_TARGET_NOT_ISABS = '目标路径必须是绝对路径！'
@@ -102,6 +104,7 @@ class ErrorInfo(object):
     COPY_TARGET_EXISTS_FILE = '目标路径已存在同名文件！'
     COPY_UNKNOWN = '复制失败：{}'
     COPY_ROOT = '不能复制根目录！'
+    COPY_NO_PATH = '没有选择要复制的文件'
 
     # 上传文件相关
     UPLOAD_DIR_ILLEGAL = '要上传的目录路径不合法'
@@ -115,9 +118,9 @@ class ErrorInfo(object):
     CREATE_DIR_EXISTS = '已有同名目录'
     CREATE_DIR_UNKNOWN = '创建目录失败：{}'
 
-    # 查看目录大小相关
-    DIR_SIZE_ILLEGAL = '目录路径不合法'
-    DIR_SIZE_NOT_ISDIR = '要查看大小的不是目录'
+    # 查看大小相关
+    DIR_SIZE_NO_PATH = '未选择文件'
+    DIR_SIZE_ILLEGAL = '路径不合法'
     DIR_SIZE_MOUNT = '不能查看根目录的大小'
 
     # 预览目录相关

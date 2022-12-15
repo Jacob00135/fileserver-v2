@@ -153,7 +153,8 @@ def download():
 def remove():
     path_list = request.form.getlist('path')
     if not path_list:
-        abort(404)
+        flash(ErrorInfo.REMOVE_NO_PATH)
+        return redirect(request.url)
 
     # 只要有一个不合法，就都不进行操作
     remove_path_list = []
@@ -181,13 +182,13 @@ def remove():
             try:
                 os.remove(path)
             except Exception as e:
-                flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
+                flash(ErrorInfo.REMOVE_UNKNOWN.format(str(e)))
                 return redirect(url_for('main.index', path=dir_path))
         else:
             try:
                 shutil.rmtree(path)
             except Exception as e:
-                flash(ErrorInfo.REMOVE_UNKNOWN.format(e.args[0]))
+                flash(ErrorInfo.REMOVE_UNKNOWN.format(str(e)))
                 return redirect(url_for('main.index', path=dir_path))
     return redirect(url_for('main.index', path=dir_path))
 
@@ -226,7 +227,7 @@ def rename():
         try:
             os.rename(path, new_path)
         except Exception as e:
-            flash(ErrorInfo.RENAME_UNKNOWN.format(e.args[0]))
+            flash(ErrorInfo.RENAME_UNKNOWN.format(str(e)))
         return redirect(url_for('main.index', path=dir_path))
 
     # 重命名目录
@@ -236,23 +237,20 @@ def rename():
     try:
         os.rename(path, new_path)
     except Exception as e:
-        flash(ErrorInfo.RENAME_UNKNOWN.format(e.args[0]))
+        flash(ErrorInfo.RENAME_UNKNOWN.format(str(e)))
     return redirect(url_for('main.index', path=dir_path))
 
 
 @main.route('/move', methods=['POST'])
 @admin_required
 def move():
-    # 检查原路径
-    path = request.form.get('source-file-path', '', type=str)
-    if not check_path_query_param(path):
-        abort(404)
-    path = os.path.realpath(path)
+    path_list = request.form.getlist('source-file-path')
+    if not path_list:
+        flash(ErrorInfo.MOVE_NO_PATH)
+        return redirect(request.url)
 
-    # 获取文件所在目录
-    dir_path = os.path.dirname(path)
-
-    # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径、目标路径下是否已有同名文件
+    # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径
+    dir_path = os.path.dirname(path_list[0])
     target_path = request.form.get('target-file-path', '', type=str)
     if target_path.find('\\') == -1 or not os.path.isabs(target_path):
         flash(ErrorInfo.MOVE_TARGET_NOT_ISABS)
@@ -264,43 +262,52 @@ def move():
     if not os.path.isdir(target_path):
         flash(ErrorInfo.MOVE_TARGET_NOT_ISDIR)
         return redirect(url_for('main.index', path=dir_path))
-    target_file_path = os.path.abspath(os.path.join(target_path, os.path.basename(path)))
-    if os.path.exists(target_file_path):
-        flash(ErrorInfo.MOVE_TARGET_EXISTS_FILE)
-        return redirect(url_for('main.index', path=dir_path))
 
-    # 移动文件
-    if os.path.isfile(path):
+    # 只要有一个不合法，就都不进行操作
+    move_path_list = []
+    for path in path_list:
+        if not check_path_query_param(path):
+            abort(404)
+        path = os.path.realpath(path)
+
+        # 检查目录路径下是否已有同名文件
+        target_file_path = os.path.abspath(os.path.join(target_path, os.path.basename(path)))
+        if os.path.exists(target_file_path):
+            flash(ErrorInfo.MOVE_TARGET_EXISTS_FILE)
+            return redirect(url_for('main.index', path=dir_path))
+
+        # 要移动的是一个文件
+        if os.path.isfile(path):
+            move_path_list.append((path, target_file_path))
+            continue
+
+        # 要移动整个目录
+        if VisibleDir.query.filter_by(dir_path=path).first() is not None or os.path.ismount(path):
+            flash(ErrorInfo.MOVE_ROOT)
+            return redirect(url_for('main.index', path=dir_path))
+        move_path_list.append((path, target_file_path))
+
+    # 逐个移动
+    for path, target_file_path in move_path_list:
         try:
             shutil.move(path, target_file_path)
         except Exception as e:
-            flash(ErrorInfo.MOVE_UNKNOWN.format(e.args[0]))
-        return redirect(url_for('main.index', path=dir_path))
+            flash(ErrorInfo.MOVE_UNKNOWN.format(str(e)))
+            return redirect(url_for('main.index', path=dir_path))
 
-    # 移动目录
-    if VisibleDir.query.filter_by(dir_path=path).first() is not None or os.path.ismount(path):
-        flash(ErrorInfo.MOVE_ROOT)
-        return redirect(url_for('main.index', path=dir_path))
-    try:
-        shutil.move(path, target_file_path)
-    except Exception as e:
-        flash(ErrorInfo.MOVE_UNKNOWN.format(e.args[0]))
     return redirect(url_for('main.index', path=dir_path))
 
 
 @main.route('/copy_file', methods=['POST'])
 @admin_required
 def copy_file():
-    # 检查原路径
-    path = request.form.get('source-file-path', '', type=str)
-    if not check_path_query_param(path):
-        abort(404)
-    path = os.path.realpath(path)
+    path_list = request.form.getlist('source-file-path')
+    if not path_list:
+        flash(ErrorInfo.COPY_NO_PATH)
+        return redirect(request.url)
 
-    # 获取文件的源目录
-    dir_path = os.path.dirname(path)
-
-    # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径、目标路径下是否已有同名文件
+    # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径
+    dir_path = os.path.dirname(path_list[0])
     target_path = request.form.get('target-file-path', '', type=str)
     if target_path.find('\\') == -1 or not os.path.isabs(target_path):
         flash(ErrorInfo.COPY_TARGET_NOT_ISABS)
@@ -312,27 +319,45 @@ def copy_file():
     if not os.path.isdir(target_path):
         flash(ErrorInfo.COPY_TARGET_NOT_ISDIR)
         return redirect(url_for('main.index', path=dir_path))
-    target_file_path = os.path.abspath(os.path.join(target_path, os.path.basename(path)))
-    if os.path.exists(target_file_path):
-        flash(ErrorInfo.COPY_TARGET_EXISTS_FILE)
-        return redirect(url_for('main.index', path=dir_path))
 
-    # 复制文件
-    if os.path.isfile(path):
-        try:
-            shutil.copy(path, target_file_path)
-        except Exception as e:
-            flash(ErrorInfo.COPY_UNKNOWN.format(e.args[0]))
-        return redirect(url_for('main.index', path=dir_path))
+    # 检查要复制的文件路径，只要有一个不合法，就都不进行操作
+    copy_path_list = []
+    for path in path_list:
+        if not check_path_query_param(path):
+            abort(404)
+        path = os.path.realpath(path)
 
-    # 复制目录
-    if os.path.ismount(path):
-        flash(ErrorInfo.COPY_ROOT)
-        return redirect(url_for('main.index', path=dir_path))
-    try:
-        shutil.copytree(path, target_file_path)
-    except Exception as e:
-        flash(ErrorInfo.COPY_UNKNOWN.format(e.args[0]))
+        # 检查同目录下是否已有同名文件
+        target_file_path = os.path.abspath(os.path.join(target_path, os.path.basename(path)))
+        if os.path.exists(target_file_path):
+            flash(ErrorInfo.COPY_TARGET_EXISTS_FILE)
+            return redirect(url_for('main.index', path=dir_path))
+
+        # 要复制的是一个文件
+        if os.path.isfile(path):
+            copy_path_list.append(('file', path, target_file_path))
+            continue
+
+        # 要复制的是一个目录
+        if os.path.ismount(path):
+            flash(ErrorInfo.COPY_ROOT)
+            return redirect(url_for('main.index', path=dir_path))
+        copy_path_list.append(('dir', path, target_file_path))
+
+    # 逐个复制
+    for file_type, path, target_file_path in copy_path_list:
+        if file_type == 'file':
+            try:
+                shutil.copy(path, target_file_path)
+            except Exception as e:
+                flash(ErrorInfo.COPY_UNKNOWN.format(str(e)))
+                return redirect(url_for('main.index', path=dir_path))
+        else:
+            try:
+                shutil.copytree(path, target_file_path)
+            except Exception as e:
+                flash(ErrorInfo.COPY_UNKNOWN.format(str(e)))
+                return redirect(url_for('main.index', path=dir_path))
     return redirect(url_for('main.index', path=dir_path))
 
 
@@ -385,41 +410,53 @@ def create_dir():
     try:
         os.mkdir(dir_path)
     except Exception as e:
-        flash(ErrorInfo.CREATE_DIR_UNKNOWN.format(e.args[0]))
+        flash(ErrorInfo.CREATE_DIR_UNKNOWN.format(str(e)))
     return redirect(url_for('main.index', path=path))
 
 
 @main.route('/dir_size')
 @login_required
 def dir_size():
-    # 检查目录路径
-    path = request.args.get('path', '', type=str)
-    if not check_path_query_param(path):
+    path_list = request.args.getlist('path')
+    if not path_list:
+        flash(ErrorInfo.DIR_SIZE_NO_PATH)
         return jsonify({
             'status': 0,
-            'message': ErrorInfo.DIR_SIZE_ILLEGAL
-        })
-    path = os.path.realpath(path)
-
-    # 检查是否是目录，是否是根路径
-    if not os.path.isdir(path):
-        return jsonify({
-            'status': 0,
-            'message': ErrorInfo.DIR_SIZE_NOT_ISDIR
-        })
-    if os.path.ismount(path):
-        return jsonify({
-            'status': 0,
-            'message': ErrorInfo.DIR_SIZE_MOUNT
+            'message': ErrorInfo.DIR_SIZE_NO_PATH
         })
 
-    # 计算目录大小
-    total = 0
-    for father, dir_names, filenames in os.walk(path):
-        for filename in filenames:
-            total = total + os.path.getsize(os.path.join(father, filename))
-    result = get_file_size(total)
+    # 检查路径是否合理，若有一个不合法，则都不进行操作
+    for path in path_list:
+        if not check_path_query_param(path):
+            return jsonify({
+                'status': 0,
+                'message': ErrorInfo.DIR_SIZE_ILLEGAL
+            })
+        path = os.path.realpath(path)
 
+        if os.path.ismount(path):
+            return jsonify({
+                'status': 0,
+                'message': ErrorInfo.DIR_SIZE_MOUNT
+            })
+
+    # 计算目录大小并返回
+    result = {
+        'total': 0,
+        'size_list': []
+    }
+    for path in path_list:
+        file_size = get_file_size(path, 'int')
+        result['total'] = result['total'] + file_size
+        result['size_list'].append({
+            'is_dir': int(os.path.isdir(path)),
+            'file_name': os.path.basename(path),
+            'file_size': file_size
+        })
+    result['total'] = get_file_size(result['total'])
+    result['size_list'] = sorted(result['size_list'], key=lambda d: d['file_size'], reverse=True)
+    for d in result['size_list']:
+        d['file_size'] = get_file_size(d['file_size'])
     return jsonify({
         'status': 1,
         'result': result

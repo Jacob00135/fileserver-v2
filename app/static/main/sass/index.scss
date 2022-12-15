@@ -41,26 +41,6 @@
     }
 }
 
-#app .file-list .action-dropdown {
-
-    [id^="action-dropdown-btn"] {
-        height: 36px;
-        transition: all .15s;
-
-        &:hover,
-        &:active,
-        &:focus,
-        &.show {
-            background-color: $bg-secondary;
-            color: $text-dark;
-        }
-
-        &::after {
-            margin-left: 0;
-        }
-    }
-}
-
 #preview-dir-modal {
 
     .struct .item {
@@ -106,6 +86,33 @@
     /* 展开、折叠图标样式 [end] */
 }
 
+#app .file-list .action-dropdown {
+
+    [id^="action-dropdown-btn"] {
+        height: 36px;
+        transition: all .15s;
+
+        &:hover,
+        &:active,
+        &:focus,
+        &.show {
+            background-color: $bg-secondary;
+            color: $text-dark;
+        }
+
+        &::after {
+            margin-left: 0;
+        }
+    }
+}
+
+#multi-total-size-modal {
+    .file-size-table .table [data-dir="1"] > td:first-child {
+        background-color: #25B4D3 !important;
+        --bs-table-accent-bg: none !important;
+    }
+}
+
 #app .multi-select-btn-group {
 
     /* 多选按钮 [start] */
@@ -118,6 +125,7 @@
         background-color: #f8f9fa;
         color: #000;
     }
+
     /* 多选按钮 [end] */
 
     /* 多选操作的下拉按钮 */

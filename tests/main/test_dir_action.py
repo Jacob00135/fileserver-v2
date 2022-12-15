@@ -189,17 +189,6 @@ class DirActionTestCase(BaseUnittestCase):
         self.assertTrue(response.status_code == 200)
         self.assertTrue(response.json is None)
 
-    def test_dir_size_not_isdir(self):
-        """查看目录大小：不是目录"""
-        self.login('admin', '123456')
-        response = self.client.get(
-            self.url_for('main.dir_size', path=os.path.realpath(os.path.join(BASE_PATH, 'requirements.txt'))),
-            follow_redirects=True
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue(response.json.get('status', 1) == 0)
-        self.assertTrue(response.json.get('message', '') == ErrorInfo.DIR_SIZE_NOT_ISDIR)
-
     def test_dir_size_not_visible(self):
         """查看目录大小：不在可见目录下"""
         self.login('admin', '123456')
@@ -228,10 +217,12 @@ class DirActionTestCase(BaseUnittestCase):
         """查看目录大小：成功"""
         self.login('admin', '123456')
         response = self.client.get(
-            self.url_for('main.dir_size', path=BASE_PATH),
+            self.url_for('main.dir_size', path=os.path.realpath(os.path.join(BASE_PATH, 'admin_dir'))),
             follow_redirects=True
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(response.json.get('status', 0) == 1)
         self.assertTrue(response.json.get('message', '') == '')
-        self.assertTrue(isinstance(response.json.get('result'), str))
+        self.assertTrue('total' in response.json.get('result', []))
+        self.assertTrue('size_list' in response.json.get('result', {}))
+        self.assertTrue(len(response.json['result']['size_list']) == 1)
