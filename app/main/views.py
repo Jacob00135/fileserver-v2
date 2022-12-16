@@ -1,6 +1,5 @@
 import os
 import shutil
-from time import sleep
 from urllib.parse import quote
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify, current_app
@@ -486,3 +485,39 @@ def preview_dir():
         'status': 1,
         'result': get_dir_struct(path)
     })
+
+
+@main.route('/compress_multi_file', methods=['POST'])
+def compress_multi_file():
+    # 检查文件路径
+    filepath_list = request.form.getlist('file-path')
+    if not filepath_list:
+        flash(ErrorInfo.COMPRESS_NO_FILEPATH)
+        return redirect(request.url)
+
+    # 检查文件路径合法性，若有一个不合法，则都不操作
+    for i, filepath in enumerate(filepath_list):
+        if not check_path_query_param(filepath):
+            abort(404)
+        filepath_list[i] = os.path.realpath(filepath)
+    dir_path = os.path.dirname(filepath_list[0])
+
+    # 检查文件名是否合法
+    filename = request.form.get('file-name', '')
+    if not check_filename(filename):
+        flash(ErrorInfo.COMPRESS_FILENAME_ILLEGAL)
+        return redirect(url_for('main.index', path=dir_path))
+
+    # 获取压缩算法类型
+    compress_type = request.form.get('compress-type', 'none')
+    if compress_type == 'none':
+        compress_type = None
+
+    # 进行压缩
+    save_path = os.path.abspath(os.path.join(dir_path, '{}.zip'.format(filename)))
+    try:
+        compress_file(filepath_list, save_path, compress_type)
+    except ValueError:
+        flash(ErrorInfo.COMPRESS_TYPE_ERROR)
+
+    return redirect(url_for('main.index', path=dir_path))

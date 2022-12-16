@@ -250,3 +250,74 @@ class MultiFileActionTestCase(BaseUnittestCase):
         self.assertTrue('total' in response.json['result'])
         self.assertTrue('size_list' in response.json['result'])
         self.assertTrue(len(response.json['result'].get('size_list')) == len(self.test_filepath_list))
+
+    def test_compress_file_illegal(self):
+        """压缩文件：文件名不合法"""
+        filename = 'demo?'
+        response = self.client.post(
+            self.url_for('main.compress_multi_file'),
+            data='file-name={}&compress-type=none&file-path={}'.format(
+                filename,
+                '&file-path='.join(map(lambda fp: quote(fp), self.test_filepath_list))
+            ),
+            follow_redirects=True,
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertFalse(os.path.exists(os.path.join(self.test_dir_path, '{}.zip'.format(filename))))
+
+    def test_compress_file_path_illegal(self):
+        """压缩文件：只要有一个路径不合法，就不进行操作"""
+        filename = 'demoZip'
+        response = self.client.post(
+            self.url_for('main.compress_multi_file'),
+            data='file-name={}&compress-type=none&file-path={}&file-path={}'.format(
+                filename,
+                '&file-path='.join(map(lambda fp: quote(fp), self.test_filepath_list)),
+                quote('a:\\demo?')
+            ),
+            follow_redirects=True,
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        )
+        self.assertTrue(response.status_code == 404)
+        self.assertFalse(os.path.exists(os.path.join(self.test_dir_path, '{}.zip'.format(filename))))
+
+    def test_compress_file_type_illegal(self):
+        """压缩文件：压缩算法类型不合法"""
+        filename = 'demoZip'
+        response = self.client.post(
+            self.url_for('main.compress_multi_file'),
+            data='file-name={}&compress-type=eee&file-path={}'.format(
+                filename,
+                '&file-path='.join(map(lambda fp: quote(fp), self.test_filepath_list))
+            ),
+            follow_redirects=True,
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertFalse(os.path.exists(os.path.join(self.test_dir_path, '{}.zip'.format(filename))))
+
+    def test_compress_file(self):
+        """压缩文件：成功"""
+        filename = 'demoZip'
+        response = self.client.post(
+            self.url_for('main.compress_multi_file'),
+            data='file-name={}&compress-type=zip&file-path={}'.format(
+                filename,
+                '&file-path='.join(map(lambda fp: quote(fp), self.test_filepath_list)),
+            ),
+            follow_redirects=True,
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        )
+        self.assertTrue(response.status_code == 200)
+        output_file = os.path.join(self.test_dir_path, '{}.zip'.format(filename))
+        self.assertTrue(os.path.exists(output_file))
+        os.remove(output_file)

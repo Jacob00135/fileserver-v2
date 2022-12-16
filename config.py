@@ -127,6 +127,11 @@ class ErrorInfo(object):
     PREVIEW_DIR_ILLEGAL = '目录路径不合法'
     PREVIEW_DIR_NOT_ISDIR = '不是目录'
 
+    # 多选压缩文件相关
+    COMPRESS_NO_FILEPATH = '未输入文件名'
+    COMPRESS_FILENAME_ILLEGAL = '文件名不能包含\\/:*?"<>|'
+    COMPRESS_TYPE_ERROR = '压缩文件算法只能是`仅存储`、`zip`、`lzma`'
+
 
 class UserNameError(object):
     ILLEGAL_CHAR = Config.USER_NAME_ILLEGAL_CHAR

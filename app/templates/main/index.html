@@ -681,6 +681,82 @@
         <!-- 多选查看总大小模态框 [end] -->
     {% endif %}
 
+    {% if current_user.is_authenticated %}
+        <!-- 压缩文件模态框 [start] -->
+        <div class="modal fade" id="compress-file-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+             data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-secondary text-white">
+
+                    <!-- 模态框头部 [start] -->
+                    <div class="modal-header position-relative">
+                        <h5 class="modal-title w-100 text-center">压缩</h5>
+                        <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                                data-bs-dismiss="modal" aria-label="Close">
+                        </button>
+                    </div>
+                    <!-- 模态框头部 [end] -->
+
+                    <!-- 模态框内容 [start] -->
+                    <div class="modal-body mb-2">
+
+                        <!-- 复制多文件表单 [start] -->
+                        <form action="{{ url_for('main.compress_multi_file') }}" method="post" name="compress-file">
+
+                            <!-- 压缩文件名称 [start] -->
+                            <div class="mb-3 compress-file-name-box">
+                                <label for="compress-file-name" class="form-label">压缩包名</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control dark-mode-input" id="compress-file-name"
+                                           name="file-name" required="" autocomplete="off"/>
+                                    <span class="input-group-text extension-name">.zip</span>
+                                </div>
+                            </div>
+                            <!-- 压缩文件名称 [end] -->
+
+                            <!-- 选择压缩算法 [start] -->
+                            <div class="mb-2">压缩算法</div>
+                            <select class="form-select dark-mode-input compress-type" name="compress-type"
+                                    aria-label="compress-type" required>
+                                <option class="option bg-dark text-light" value="none" selected>仅存储</option>
+                                <option class="option bg-dark text-light" value="zip">zip</option>
+                                <option class="option bg-dark text-light" value="lzma">lzma</option>
+                            </select>
+                            <!-- 选择压缩算法 [end] -->
+
+                            <!-- 添加的文件 [start] -->
+                            <div class="border-top border-bottom mt-3 pb-3 file-name-list">
+                                <h5 class="text-center py-2">要添加到压缩包的文件</h5>
+                                <div class="overflow-auto list">
+                                </div>
+                            </div>
+                            <!-- 添加的文件 [end] -->
+
+                            <!-- “正在加载”动画效果 [start] -->
+                            <div class="loading text-center d-flex justify-content-center mt-2 d-none">
+                                <div class="spinner-border text-dark" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div class="h5 mb-0 ms-2 hint-text">正在压缩...</div>
+                            </div>
+                            <!-- “正在加载”动画效果 [end] -->
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-info gray-shadow me-4">确定</button>
+                                <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
+                            </div>
+                        </form>
+                        <!-- 复制多文件表单 [end] -->
+
+                    </div>
+                    <!-- 模态框内容 [end] -->
+
+                </div>
+            </div>
+        </div>
+        <!-- 压缩文件模态框 [end] -->
+    {% endif %}
+
 {% endblock modal %}
 
 {% block content %}
@@ -734,10 +810,18 @@
                             {% if current_user.is_authenticated %}
                                 <li>
                                     <a class="dropdown-item total-size" href="javascript:;"
-                                       data-href="{{ url_for('main.dir_size') }}">查看总大小</a>
+                                       data-href="{{ url_for('main.dir_size') }}">统计大小</a>
                                 </li>
                             {% endif %}
                             <!-- 查看多个文件总大小 [end] -->
+
+                            <!-- 压缩 [start] -->
+                            {% if current_user.is_admin() %}
+                                <li>
+                                    <a class="dropdown-item compress-file" href="javascript:;">压缩</a>
+                                </li>
+                            {% endif %}
+                            <!-- 压缩 [end] -->
 
                             <!-- 复制按钮 [start] -->
                             {% if current_user.is_admin() %}

@@ -634,7 +634,7 @@
 
     // 多选删除
     (() => {
-        const btn = document.querySelector('.multi-select-btn-group .remove');
+        const btn = document.querySelector('#app .multi-select-btn-group .remove');
         if (!btn) return undefined;
         const modal = document.getElementById('delete-multi-file-modal');
 
@@ -645,7 +645,7 @@
                 const html = `<span class="bg-danger bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
                     <br/>
                     <input class="d-none" type="text" name="path" value="{{ file-path }}" required="required"/>`
-                    .replace(/\{\{ file-path }}/g, input.value);
+                    .replace(/\{\{ file-path \}\}/g, input.value);
                 htmlList.push(html);
             });
             if (htmlList.length <= 0) return undefined;
@@ -658,7 +658,7 @@
 
     // 多选移动
     (() => {
-        const btn = document.querySelector('.multi-select-btn-group .move');
+        const btn = document.querySelector('#app .multi-select-btn-group .move');
         if (!btn) return undefined;
         const modal = document.getElementById('move-multi-file-modal');
         btn.addEventListener('click', (e) => {
@@ -668,7 +668,7 @@
                 const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
                     <br/>
                     <input class="d-none" type="text" name="source-file-path" value="{{ file-path }}" required="required"/>`
-                    .replace(/\{\{ file-path }}/g, input.value);
+                    .replace(/\{\{ file-path \}\}/g, input.value);
                 htmlList.push(html);
             });
             if (htmlList.length <= 0) return undefined;
@@ -681,7 +681,7 @@
 
     // 多选复制
     (() => {
-        const btn = document.querySelector('.multi-select-btn-group .copy');
+        const btn = document.querySelector('#app .multi-select-btn-group .copy');
         if (!btn) return undefined;
         const modal = document.getElementById('copy-multi-file-modal');
 
@@ -692,7 +692,7 @@
                 const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
                     <br/>
                     <input class="d-none" type="text" name="source-file-path" value="{{ file-path }}" required="required"/>`
-                    .replace(/\{\{ file-path }}/g, input.value);
+                    .replace(/\{\{ file-path \}\}/g, input.value);
                 htmlList.push(html);
             });
             if (htmlList.length <= 0) return undefined;
@@ -705,7 +705,7 @@
 
     // 多选文件查看总大小
     (() => {
-        const btn = document.querySelector('.multi-select-btn-group .total-size');
+        const btn = document.querySelector('#app .multi-select-btn-group .total-size');
         if (!btn) return undefined;
         const modal = document.getElementById('multi-total-size-modal');
 
@@ -753,6 +753,38 @@
                     modal.querySelector('.fail-info').classList.remove('d-none');
                 }
             );
+        });
+    })();
+
+    // 压缩文件
+    (() => {
+        const btn = document.querySelector('#app .multi-select-btn-group .compress-file');
+        if (!btn) return undefined;
+        const modal = document.getElementById('compress-file-modal');
+        const form = document.forms['compress-file'];
+
+        btn.addEventListener('click', (e) => {
+            // 收集选择的文件信息
+            const htmlList = [];
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]')
+                .forEach((input) => {
+                    const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-name }}</span>
+                        <br/>
+                        <input class="d-none" type="text" name="file-path" value="{{ file-path }}"
+                            required="required"/>`
+                        .replace(/\{\{ file-path \}\}/g, input.value)
+                        .replace('{{ file-name }}', input.value.split('\\').pop());
+                    htmlList.push(html);
+                });
+            if (htmlList.length <= 0) return undefined;
+
+            // 显示模态框
+            form.querySelector('.file-name-list .list').innerHTML = htmlList.join('');
+            (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
+
+        form.addEventListener('submit', (e) => {
+            modal.querySelector('.loading').classList.remove('d-none');
         });
     })();
 

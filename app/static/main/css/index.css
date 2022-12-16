@@ -107,6 +107,24 @@
   content: "\f229";
 }
 
+#multi-total-size-modal .file-size-table .table [data-dir="1"] > td:first-child {
+  background-color: #25B4D3 !important;
+  --bs-table-accent-bg: none !important;
+}
+
+#compress-file-modal form[name=compress-file] .compress-file-name-box .extension-name {
+  cursor: default;
+}
+#compress-file-modal form[name=compress-file] .compress-type {
+  cursor: pointer;
+}
+#compress-file-modal form[name=compress-file] .file-name-list .list {
+  max-height: 10rem;
+}
+#compress-file-modal form[name=compress-file] .loading .hint-text {
+  line-height: 2rem;
+}
+
 #app .file-list .action-dropdown [id^=action-dropdown-btn] {
   height: 36px;
   transition: all 0.15s;
@@ -117,11 +135,6 @@
 }
 #app .file-list .action-dropdown [id^=action-dropdown-btn]::after {
   margin-left: 0;
-}
-
-#multi-total-size-modal .file-size-table .table [data-dir="1"] > td:first-child {
-  background-color: #25B4D3 !important;
-  --bs-table-accent-bg: none !important;
 }
 
 #app .multi-select-btn-group {
