@@ -43,6 +43,20 @@ class DirActionTestCase(BaseUnittestCase):
         if os.path.exists(self.test_dir_path):
             shutil.rmtree(self.test_dir_path)
 
+    def test_download_root_dir(self):
+        """下载目录失败：根目录"""
+        db.session.add(VisibleDir(
+            dir_path='C:\\',
+            permission='anonymous_user'
+        ))
+        db.session.commit()
+        response = self.client.get(
+            self.url_for('main.download', path='C:\\'),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('text/html' in response.headers.get('Content-Type', ''))
+
     def test_remove_visible_dir(self):
         """删除目录失败：尝试删除可见目录"""
         db.session.add(VisibleDir(

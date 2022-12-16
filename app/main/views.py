@@ -1,5 +1,6 @@
 import os
 import shutil
+from time import time as get_timestamp
 from urllib.parse import quote
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify, current_app
@@ -108,12 +109,17 @@ def download():
         flash(ErrorInfo.DOWNLOAD_MOUNT)
         return redirect(url_for('main.index', path=dir_path))
 
-    # 压缩目录
-    compress_filepath = path + '.zip'
-    compress_filename = os.path.basename(compress_filepath)
-    compress_file(file_path_list=[path], output_path=path + '.zip', compress_type=None)
+    # 决定压缩包的名称
+    compress_filename = '{}{}.zip'.format(filename, str(get_timestamp()))
+    compress_filepath = os.path.abspath(os.path.join(dir_path, compress_filename))
+    while os.path.exists(compress_filepath):
+        compress_filename = '{}{}.zip'.format(filename, str(get_timestamp()))
+        compress_filepath = os.path.abspath(os.path.join(dir_path, compress_filename))
 
-    # 分块读取文件
+    # 压缩目录
+    compress_file(file_path_list=[path], output_path=compress_filepath, compress_type=None)
+
+    # 分块读取文件，防止因文件过大导致内存不足
     def read_file():
         block_size = 1024 * 1024  # 每一块的大小，单位为字节
         with open(compress_filepath, 'rb') as file:
@@ -138,10 +144,12 @@ def download():
                 pass
         after_response.callbacks.pop()
 
+    # 响应
+    source_filename = '{}.zip'.format(filename)
     return current_app.response_class(read_file(), headers={
         'Content-Disposition': "attachment; filename={}; filename*=UTF-8''{}".format(
-            quote(secure_filename(compress_filename)),
-            quote(compress_filename)
+            quote(secure_filename(source_filename)),
+            quote(source_filename)
         ),
         'Content-Type': 'application/x-zip-compressed'
     })
@@ -499,6 +507,9 @@ def compress_multi_file():
     for i, filepath in enumerate(filepath_list):
         if not check_path_query_param(filepath):
             abort(404)
+        if os.path.ismount(filepath):
+            flash(ErrorInfo.COMPRESS_ROOT)
+            return redirect(request.url)
         filepath_list[i] = os.path.realpath(filepath)
     dir_path = os.path.dirname(filepath_list[0])
 
@@ -508,13 +519,18 @@ def compress_multi_file():
         flash(ErrorInfo.COMPRESS_FILENAME_ILLEGAL)
         return redirect(url_for('main.index', path=dir_path))
 
+    # 检查压缩包是否已存在
+    save_path = os.path.abspath(os.path.join(dir_path, '{}.zip'.format(filename)))
+    if os.path.exists(save_path):
+        flash(ErrorInfo.COMPRESS_FILE_EXISTS)
+        return redirect(url_for('main.index', path=dir_path))
+
     # 获取压缩算法类型
     compress_type = request.form.get('compress-type', 'none')
     if compress_type == 'none':
         compress_type = None
 
     # 进行压缩
-    save_path = os.path.abspath(os.path.join(dir_path, '{}.zip'.format(filename)))
     try:
         compress_file(filepath_list, save_path, compress_type)
     except ValueError:

@@ -129,7 +129,9 @@ class ErrorInfo(object):
 
     # 多选压缩文件相关
     COMPRESS_NO_FILEPATH = '未输入文件名'
+    COMPRESS_ROOT = '不能压缩根目录'
     COMPRESS_FILENAME_ILLEGAL = '文件名不能包含\\/:*?"<>|'
+    COMPRESS_FILE_EXISTS = '同名压缩包已存在！'
     COMPRESS_TYPE_ERROR = '压缩文件算法只能是`仅存储`、`zip`、`lzma`'
 
 
