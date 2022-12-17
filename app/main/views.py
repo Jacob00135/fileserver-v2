@@ -3,7 +3,8 @@ import shutil
 from time import time as get_timestamp
 from urllib.parse import quote
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify, current_app
+from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify, \
+    current_app
 from flask_login import current_user, login_required
 from config import ErrorInfo, Config
 from app import after_response
@@ -89,35 +90,58 @@ def request_entity_too_large(e):
 
 @main.route('/download')
 def download():
-    # 检查查询参数
-    path = request.args.get('path', '', type=str)
-    if not check_path_query_param(path):
-        abort(404)
-    path = os.path.realpath(path)
+    path_list = request.args.getlist('path')
+    if not path_list:
+        flash(ErrorInfo.DOWNLOAD_NO_PATH)
+        return redirect(url_for('main.index'))
 
-    # 响应文件
-    dir_path, filename = os.path.split(path)
-    if os.path.isfile(path):
+    # 检查路径参数，若有一个不合法，则都不进行操作
+    for i, path in enumerate(path_list):
+        if not check_path_query_param(path):
+            abort(404)
+        path = os.path.realpath(path)
+
+        if os.path.ismount(path):
+            flash(ErrorInfo.DOWNLOAD_MOUNT)
+            return redirect(url_for('main.index'))
+
+        path_list[i] = path
+
+    dir_path, filename = os.path.split(path_list[0])
+
+    # 响应单个文件
+    if len(path_list) == 1 and os.path.isfile(path_list[0]):
         return send_from_directory(
             directory=dir_path,
-            path=os.path.basename(path),
+            path=filename,
             as_attachment=True
         )
 
-    # 检查是否是根目录
-    if os.path.ismount(path):
-        flash(ErrorInfo.DOWNLOAD_MOUNT)
-        return redirect(url_for('main.index', path=dir_path))
-
-    # 决定压缩包的名称
-    compress_filename = '{}{}.zip'.format(filename, str(get_timestamp()))
-    compress_filepath = os.path.abspath(os.path.join(dir_path, compress_filename))
-    while os.path.exists(compress_filepath):
+    # 响应单个目录、多个文件、多个目录等，都会先压缩再下载
+    # 如果是单个目录，则压缩包名可以与目录名相同
+    # 如果是多个文件/目录，则压缩包名将是随机时间戳
+    if len(path_list) == 1 and os.path.isdir(path_list[0]):
+        # 决定单目录下载时的压缩包名称
+        response_filename = '{}.zip'.format(filename)
         compress_filename = '{}{}.zip'.format(filename, str(get_timestamp()))
         compress_filepath = os.path.abspath(os.path.join(dir_path, compress_filename))
+        while os.path.exists(compress_filepath):
+            compress_filename = '{}{}.zip'.format(filename, str(get_timestamp()))
+            compress_filepath = os.path.abspath(os.path.join(dir_path, compress_filename))
+    elif len(path_list) > 1:
+        # 决定多文件下载时的压缩包名称
+        compress_filename = '{}.zip'.format(str(get_timestamp()))
+        compress_filepath = os.path.abspath(os.path.join(dir_path, compress_filename))
+        while os.path.exists(compress_filepath):
+            compress_filename = '{}.zip'.format(str(get_timestamp()))
+            compress_filepath = os.path.abspath(os.path.join(dir_path, compress_filename))
+        response_filename = compress_filename
+    else:
+        flash(ErrorInfo.DOWNLOAD_UNKNOWN)
+        return redirect(url_for('main.index', path=os.path.dirname(path_list[0])))
 
-    # 压缩目录
-    compress_file(file_path_list=[path], output_path=compress_filepath, compress_type=None)
+    # 压缩
+    compress_file(file_path_list=path_list, output_path=compress_filepath, compress_type=None)
 
     # 分块读取文件，防止因文件过大导致内存不足
     def read_file():
@@ -145,11 +169,10 @@ def download():
         after_response.callbacks.pop()
 
     # 响应
-    source_filename = '{}.zip'.format(filename)
     return current_app.response_class(read_file(), headers={
         'Content-Disposition': "attachment; filename={}; filename*=UTF-8''{}".format(
-            quote(secure_filename(source_filename)),
-            quote(source_filename)
+            quote(secure_filename(response_filename)),
+            quote(response_filename)
         ),
         'Content-Type': 'application/x-zip-compressed'
     })
@@ -161,7 +184,7 @@ def remove():
     path_list = request.form.getlist('path')
     if not path_list:
         flash(ErrorInfo.REMOVE_NO_PATH)
-        return redirect(request.url)
+        return redirect(url_for('main.index'))
 
     # 只要有一个不合法，就都不进行操作
     remove_path_list = []
@@ -254,7 +277,7 @@ def move():
     path_list = request.form.getlist('source-file-path')
     if not path_list:
         flash(ErrorInfo.MOVE_NO_PATH)
-        return redirect(request.url)
+        return redirect(url_for('main.index'))
 
     # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径
     dir_path = os.path.dirname(path_list[0])
@@ -311,7 +334,7 @@ def copy_file():
     path_list = request.form.getlist('source-file-path')
     if not path_list:
         flash(ErrorInfo.COPY_NO_PATH)
-        return redirect(request.url)
+        return redirect(url_for('main.index'))
 
     # 检查目标路径：是否是绝对路径、路径是否存在、是否是目录路径
     dir_path = os.path.dirname(path_list[0])
@@ -501,7 +524,7 @@ def compress_multi_file():
     filepath_list = request.form.getlist('file-path')
     if not filepath_list:
         flash(ErrorInfo.COMPRESS_NO_FILEPATH)
-        return redirect(request.url)
+        return redirect(url_for('main.index'))
 
     # 检查文件路径合法性，若有一个不合法，则都不操作
     for i, filepath in enumerate(filepath_list):
@@ -509,7 +532,7 @@ def compress_multi_file():
             abort(404)
         if os.path.ismount(filepath):
             flash(ErrorInfo.COMPRESS_ROOT)
-            return redirect(request.url)
+            return redirect(url_for('main.index'))
         filepath_list[i] = os.path.realpath(filepath)
     dir_path = os.path.dirname(filepath_list[0])
 

@@ -74,7 +74,9 @@ class ErrorInfo(object):
     VISIBLE_DIR_EXISTS = '可见目录已存在！'
 
     # 下载文件相关
+    DOWNLOAD_NO_PATH = '没有选择下载的文件'
     DOWNLOAD_MOUNT = '不能下载根目录！'
+    DOWNLOAD_UNKNOWN = '下载失败：有路径既不是文件也不是目录'
 
     # 删除文件相关
     REMOVE_UNKNOWN = '删除失败：{}'

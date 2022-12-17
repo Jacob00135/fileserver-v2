@@ -57,6 +57,10 @@
                 (new bootstrap.Modal(modal, {keyboard: false})).show();
             });
         });
+
+        form.addEventListener('submit', (e) => {
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
+        });
     })();
 
     // 重命名文件
@@ -74,6 +78,10 @@
                 (new bootstrap.Modal(modal, {keyboard: false})).show();
             });
         });
+
+        form.addEventListener('submit', (e) => {
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
+        });
     })();
 
     // 移动文件
@@ -89,6 +97,10 @@
                 (new bootstrap.Modal(modal, {keyboard: false})).show();
             });
         });
+
+        form.addEventListener('submit', (e) => {
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
+        });
     })();
 
     // 复制文件
@@ -103,6 +115,10 @@
                 filePathInput.setAttribute('value', a.getAttribute('data-file-path'));
                 (new bootstrap.Modal(modal, {keyboard: false})).show();
             });
+        });
+
+        form.addEventListener('submit', (e) => {
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
         });
     })();
 
@@ -637,22 +653,29 @@
         const btn = document.querySelector('#app .multi-select-btn-group .remove');
         if (!btn) return undefined;
         const modal = document.getElementById('delete-multi-file-modal');
+        const form = document.forms['delete-multi-file'];
 
         btn.addEventListener('click', (e) => {
             // 收集要删除的文件的路径
             const htmlList = [];
-            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]').forEach((input) => {
-                const html = `<span class="bg-danger bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]')
+                .forEach((input) => {
+                    const html = `<span class="bg-danger bg-opacity-75 px-1 rounded-1">{{ file-name }}</span>
                     <br/>
                     <input class="d-none" type="text" name="path" value="{{ file-path }}" required="required"/>`
-                    .replace(/\{\{ file-path \}\}/g, input.value);
-                htmlList.push(html);
-            });
+                        .replace('{{ file-path }}', input.value)
+                        .replace('{{ file-name }}', input.value.split('\\').pop());
+                    htmlList.push(html);
+                });
             if (htmlList.length <= 0) return undefined;
 
             // 显示模态框
             modal.querySelector('.file-path-list').innerHTML = htmlList.join('');
             (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
+
+        form.addEventListener('submit', (e) => {
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
         });
     })();
 
@@ -661,21 +684,30 @@
         const btn = document.querySelector('#app .multi-select-btn-group .move');
         if (!btn) return undefined;
         const modal = document.getElementById('move-multi-file-modal');
+        const form = document.forms['move-multi-file'];
+
         btn.addEventListener('click', (e) => {
             // 收集要移动的文件的路径
             const htmlList = [];
-            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]').forEach((input) => {
-                const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]')
+                .forEach((input) => {
+                    const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-name }}</span>
                     <br/>
-                    <input class="d-none" type="text" name="source-file-path" value="{{ file-path }}" required="required"/>`
-                    .replace(/\{\{ file-path \}\}/g, input.value);
-                htmlList.push(html);
-            });
+                    <input class="d-none" type="text" name="source-file-path" value="{{ file-path }}"
+                        required="required"/>`
+                        .replace('{{ file-path }}', input.value)
+                        .replace('{{ file-name }}', input.value.split('\\').pop());
+                    htmlList.push(html);
+                });
             if (htmlList.length <= 0) return undefined;
 
             // 显示模态框
             modal.querySelector('.file-path-list').innerHTML = htmlList.join('');
             (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
+
+        form.addEventListener('submit', (e) => {
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
         });
     })();
 
@@ -684,22 +716,30 @@
         const btn = document.querySelector('#app .multi-select-btn-group .copy');
         if (!btn) return undefined;
         const modal = document.getElementById('copy-multi-file-modal');
+        const form = document.forms['copy-multi-file'];
 
         btn.addEventListener('click', (e) => {
             // 收集要复制的文件的路径
             const htmlList = [];
-            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]').forEach((input) => {
-                const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-path }}</span>
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]')
+                .forEach((input) => {
+                    const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-name }}</span>
                     <br/>
-                    <input class="d-none" type="text" name="source-file-path" value="{{ file-path }}" required="required"/>`
-                    .replace(/\{\{ file-path \}\}/g, input.value);
-                htmlList.push(html);
-            });
+                    <input class="d-none" type="text" name="source-file-path" value="{{ file-path }}"
+                        required="required"/>`
+                        .replace('{{ file-path }}', input.value)
+                        .replace('{{ file-name }}', input.value.split('\\').pop());
+                    htmlList.push(html);
+                });
             if (htmlList.length <= 0) return undefined;
 
             // 显示模态框
             modal.querySelector('.file-path-list').innerHTML = htmlList.join('');
             (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
+
+        form.addEventListener('submit', (e) => {
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
         });
     })();
 
@@ -772,7 +812,7 @@
                         <br/>
                         <input class="d-none" type="text" name="file-path" value="{{ file-path }}"
                             required="required"/>`
-                        .replace(/\{\{ file-path \}\}/g, input.value)
+                        .replace('{{ file-path }}', input.value)
                         .replace('{{ file-name }}', input.value.split('\\').pop());
                     htmlList.push(html);
                 });
@@ -785,6 +825,40 @@
 
         form.addEventListener('submit', (e) => {
             modal.querySelector('.loading').classList.remove('d-none');
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
+        });
+    })();
+
+    // 多选下载
+    (() => {
+        const btn = document.querySelector('#app .multi-select-btn-group .download');
+        if (!btn) return undefined;
+        const modal = document.getElementById('multi-download-modal');
+        const form = document.forms['multi-download'];
+
+        btn.addEventListener('click', (e) => {
+            // 收集选择的文件信息
+            const htmlList = [];
+            document.querySelectorAll('#app .file-list .list-group-item[data-active="1"] input[name="file-name"]')
+                .forEach((input) => {
+                    const html = `<span class="bg-info bg-opacity-75 px-1 rounded-1">{{ file-name }}</span>
+                        <br/>
+                        <input class="d-none" type="text" name="path" value="{{ file-path }}"
+                            required="required"/>`
+                        .replace('{{ file-path }}', input.value)
+                        .replace('{{ file-name }}', input.value.split('\\').pop());
+                    htmlList.push(html);
+                });
+            if (htmlList.length <= 0) return undefined;
+
+            // 显示模态框
+            form.querySelector('.file-name-list .list').innerHTML = htmlList.join('');
+            (new bootstrap.Modal(modal, {keyboard: false})).show();
+        });
+
+        form.addEventListener('submit', (e) => {
+            modal.querySelector('.loading').classList.remove('d-none');
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
         });
     })();
 

@@ -125,6 +125,13 @@
   line-height: 2rem;
 }
 
+#multi-download-modal form[name=multi-download] .file-name-list .list {
+  max-height: 10rem;
+}
+#multi-download-modal form[name=multi-download] .loading .hint-text {
+  line-height: 2rem;
+}
+
 #app .file-list .action-dropdown [id^=action-dropdown-btn] {
   height: 36px;
   transition: all 0.15s;

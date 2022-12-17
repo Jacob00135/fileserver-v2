@@ -757,6 +757,61 @@
         <!-- 压缩文件模态框 [end] -->
     {% endif %}
 
+    <!-- 下载多个文件模态框 [start] -->
+    <div class="modal fade" id="multi-download-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+         data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-secondary text-white">
+
+                <!-- 模态框头部 [start] -->
+                <div class="modal-header position-relative">
+                    <h5 class="modal-title w-100 text-center">下载多个文件</h5>
+                    <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                            data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <!-- 模态框头部 [end] -->
+
+                <!-- 模态框内容 [start] -->
+                <div class="modal-body mb-2">
+
+                    <!-- 下载多文件表单 [start] -->
+                    <form action="{{ url_for('main.download') }}" method="get" name="multi-download">
+
+                        注：文件将会被压缩再下载
+
+                        <!-- 要下载的文件 [start] -->
+                        <div class="border-top border-bottom mt-3 pb-3 file-name-list">
+                            <h5 class="text-center py-2">要下载的文件</h5>
+                            <div class="overflow-auto list">
+                            </div>
+                        </div>
+                        <!-- 要下载的文件 [end] -->
+
+                        <!-- “正在加载”动画效果 [start] -->
+                        <div class="loading text-center d-flex justify-content-center mt-2 d-none">
+                            <div class="spinner-border text-dark" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="h5 mb-0 ms-2 hint-text">正在压缩...</div>
+                        </div>
+                        <!-- “正在加载”动画效果 [end] -->
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-info gray-shadow me-4">下载</button>
+                            <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
+                        </div>
+                    </form>
+                    <!-- 下载多文件表单 [end] -->
+
+                </div>
+                <!-- 模态框内容 [end] -->
+
+            </div>
+        </div>
+    </div>
+    <!-- 下载多个文件模态框 [end] -->
+
 {% endblock modal %}
 
 {% block content %}
@@ -805,6 +860,12 @@
 
                         <!-- 下拉菜单 [start] -->
                         <ul class="dropdown-menu dropdown-menu-dark">
+
+                            <!-- 下载 [start] -->
+                            <li>
+                                <a class="dropdown-item download" href="javascript:;">下载</a>
+                            </li>
+                            <!-- 下载 [end] -->
 
                             <!-- 查看多个文件总大小 [start] -->
                             {% if current_user.is_authenticated %}
