@@ -170,3 +170,33 @@
         box-shadow: 0 0 0 0 #00000000;
     }
 }
+
+#file-pagination .pagination {
+    /* 分页导航样式 */
+    margin-top: -1.5rem;
+
+    & > .page-item.normal > .page-link,
+    & > .page-item.next > .page-link,
+    & > .page-item.prev > .page-link,
+    & > .page-item.ellipsis > .page-link {
+        border-color: $bg-dark;
+        background-color: $bg-secondary;
+        color: $text-light;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $bg-dark;
+        }
+    }
+
+    & > .page-item.active > .page-link {
+        border-color: $bg-dark;
+        background-color: $bg-dark;
+        color: $text-primary;
+        cursor: default;
+
+        &:hover {
+            background-color: $bg-dark;
+        }
+    }
+}

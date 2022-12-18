@@ -137,7 +137,7 @@
   transition: all 0.15s;
 }
 #app .file-list .action-dropdown [id^=action-dropdown-btn]:hover, #app .file-list .action-dropdown [id^=action-dropdown-btn]:active, #app .file-list .action-dropdown [id^=action-dropdown-btn]:focus, #app .file-list .action-dropdown [id^=action-dropdown-btn].show {
-  background-color: #a5acba;
+  background-color: #6c757d;
   color: #212529;
 }
 #app .file-list .action-dropdown [id^=action-dropdown-btn]::after {
@@ -160,6 +160,29 @@
 #app .multi-select-btn-group #multi-select-dropdown-btn {
   border-left-color: #212529 !important;
   box-shadow: 0 0 0 0 #00000000;
+}
+
+#file-pagination .pagination {
+  /* 分页导航样式 */
+  margin-top: -1.5rem;
+}
+#file-pagination .pagination > .page-item.normal > .page-link, #file-pagination .pagination > .page-item.next > .page-link, #file-pagination .pagination > .page-item.prev > .page-link, #file-pagination .pagination > .page-item.ellipsis > .page-link {
+  border-color: #212529;
+  background-color: #6c757d;
+  color: #F8F9FA;
+  cursor: pointer;
+}
+#file-pagination .pagination > .page-item.normal > .page-link:hover, #file-pagination .pagination > .page-item.next > .page-link:hover, #file-pagination .pagination > .page-item.prev > .page-link:hover, #file-pagination .pagination > .page-item.ellipsis > .page-link:hover {
+  background-color: #212529;
+}
+#file-pagination .pagination > .page-item.active > .page-link {
+  border-color: #212529;
+  background-color: #212529;
+  color: #0d6efd;
+  cursor: default;
+}
+#file-pagination .pagination > .page-item.active > .page-link:hover {
+  background-color: #212529;
 }
 
 /*# sourceMappingURL=index.css.map */

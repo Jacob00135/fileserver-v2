@@ -862,4 +862,15 @@
         });
     })();
 
+    // 分页导航的跳转按钮（省略号）
+    (() => {
+        const modal = document.getElementById('jump-page-modal');
+        if (!modal) return undefined;
+        document.querySelectorAll('#file-pagination .page-item.ellipsis').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                (new bootstrap.Modal(modal, {keyboard: false})).show();
+            });
+        });
+    })();
+
 })(window, document);

@@ -1,8 +1,5 @@
 import os
-
-
-def connect(path1: str, path2: str, *args) -> str:
-    return os.path.realpath(os.path.join(path1, path2, *args))
+from collections import OrderedDict
 
 
 def get_file_size(file_path: str or int, result: str = 'str') -> str or int:
@@ -44,6 +41,15 @@ def is_legal_path(path: str) -> bool:
     return True
 
 
+def get_file_type(filepath: str) -> str:
+    if os.path.isdir(filepath):
+        return 'dir'
+    i = filepath.rfind('.')
+    if i == -1:
+        return 'unknown'
+    return FilePath.extension_type_map.get(filepath[i + 1:], 'unknown')
+
+
 class Path(object):
 
     def __init__(self, path: str):
@@ -70,6 +76,10 @@ class MountPath(Path):
         # 用于统一获取属性
         self.name = self.dirname[:-1]
 
+        # 用于指定读取子文件的区间段
+        self.read_section = (0, None)
+        self.children_sort = True
+
     @staticmethod
     def is_upper():
         """判断path是否是上层路径"""
@@ -83,7 +93,7 @@ class MountPath(Path):
     @property
     def children(self):
         if self.__children is None:
-            self.__children = get_children(self.path)
+            self.__children = get_children(self.path, self.read_section, self.children_sort)
         return self.__children
 
 
@@ -107,6 +117,10 @@ class DirPath(Path):
         # 用于统一获取属性
         self.name = self.dirname
 
+        # 用于指定读取子文件的区间段
+        self.read_section = (0, None)
+        self.children_sort = True
+
     @property
     def father(self):
         if self.__father is None:
@@ -119,7 +133,7 @@ class DirPath(Path):
     @property
     def children(self):
         if self.__children is None:
-            self.__children = get_children(self.path)
+            self.__children = get_children(self.path, self.read_section, self.children_sort)
         return self.__children
 
     def is_upper(self, path: str) -> bool:
@@ -262,10 +276,31 @@ class FilePath(Path):
         return path == self.father_path
 
 
-def get_children(path: str) -> list[DirPath or FilePath]:
+def get_children(path: str, read_section: tuple = (0, None), sort_by_type: bool = True) -> list[DirPath or FilePath]:
+    file_list = os.listdir(path)
+    if sort_by_type:
+        # 获取目录中所有子文件的文件名，并按照文件类型进行排序
+        file_map = OrderedDict({
+            'dir': [],
+            'package': [],
+            'video': [],
+            'image': [],
+            'audio': [],
+            'text': [],
+            'unknown': []
+        })
+        for filename in os.listdir(path):
+            file_type = get_file_type(os.path.realpath(os.path.join(path, filename)))
+            file_map[file_type].append(filename)
+        file_list = []
+        while file_map:
+            file_list.extend(file_map.popitem(False)[1])
+
+    # 实例化
     children = []
-    for filename in os.listdir(path):
-        child_path = connect(path, filename)
+    start, end = read_section
+    for filename in file_list[start:end]:
+        child_path = os.path.realpath(os.path.join(path, filename))
         if os.path.isdir(child_path):
             children.append(DirPath(child_path))
         elif os.path.isfile(child_path):
@@ -287,6 +322,4 @@ def create_path_object(visible_dir_list: list) -> list:
 
 
 if __name__ == '__main__':
-    p = FilePath('../开发文档.docx')
-    print(p.father_path)
-    print(p.mount.children)
+    pass

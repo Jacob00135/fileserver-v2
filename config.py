@@ -27,6 +27,9 @@ class Config(object):
     # 密码不允许出现的字符
     USER_PASSWORD_ILLEGAL_CHAR = '[^a-zA-Z0-9@()_-]'
 
+    # 分页时，每一页能显示的条目数
+    PAGE_MAX_FILE_NUMBER = 20
+
     @staticmethod
     def init_app(app):
         pass

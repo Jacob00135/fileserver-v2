@@ -3,3 +3,42 @@
         <i class="bi bi-clipboard copy-icon"></i>
     </button>
 {% endmacro %}
+
+{# 关于分页导航的宏 [start] #}
+{% macro normal_page_link(path, page) %}
+    <li class="page-item normal">
+        <a class="page-link"
+           href="{{ url_for('main.index', path=path, page=page) }}">{{ page }}</a>
+    </li>
+{% endmacro %}
+
+{% macro active_page_link(page) %}
+    <li class="page-item active" aria-current="page">
+        <a class="page-link">{{ page }}</a>
+    </li>
+{% endmacro %}
+
+{% macro ellipsis_page_link() %}
+    <li class="page-item ellipsis">
+        <a class="page-link">...</a>
+    </li>
+{% endmacro %}
+
+{% macro prev_page_link(path, page) %}
+    <li class="page-item prev">
+        <a class="page-link" aria-label="Next"
+           href="{{ url_for('main.index', path=path, page=page) }}">
+            <span aria-hidden="true">&laquo;</span>
+        </a>
+    </li>
+{% endmacro %}
+
+{% macro next_page_link(path, page) %}
+    <li class="page-item next">
+        <a class="page-link" aria-label="Next"
+           href="{{ url_for('main.index', path=path, page=page) }}">
+            <span aria-hidden="true">&raquo;</span>
+        </a>
+    </li>
+{% endmacro %}
+{# 关于分页导航的宏 [end] #}

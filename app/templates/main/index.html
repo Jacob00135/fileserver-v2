@@ -700,7 +700,7 @@
                     <!-- 模态框内容 [start] -->
                     <div class="modal-body mb-2">
 
-                        <!-- 复制多文件表单 [start] -->
+                        <!-- 压缩多文件表单 [start] -->
                         <form action="{{ url_for('main.compress_multi_file') }}" method="post" name="compress-file">
 
                             <!-- 压缩文件名称 [start] -->
@@ -709,7 +709,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control dark-mode-input" id="compress-file-name"
                                            name="file-name" required="" autocomplete="off"/>
-                                    <span class="input-group-text extension-name">.zip</span>
+                                    <span class="input-group-text my-input-group-text extension-name">.zip</span>
                                 </div>
                             </div>
                             <!-- 压缩文件名称 [end] -->
@@ -746,7 +746,7 @@
                                 <button type="button" class="btn btn-dark gray-shadow" data-bs-dismiss="modal">取消</button>
                             </div>
                         </form>
-                        <!-- 复制多文件表单 [end] -->
+                        <!-- 压缩多文件表单 [end] -->
 
                     </div>
                     <!-- 模态框内容 [end] -->
@@ -811,6 +811,48 @@
         </div>
     </div>
     <!-- 下载多个文件模态框 [end] -->
+
+    {% if num_page %}
+        <!-- 跳转页码模态框 [start] -->
+        <div class="modal fade" id="jump-page-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+             data-bs-keyboard="false">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+                <div class="modal-content bg-secondary text-white">
+
+                    <!-- 模态框头部 [start] -->
+                    <div class="modal-header position-relative">
+                        <h5 class="modal-title w-100 text-center">跳转到指定页</h5>
+                        <button type="button" class="btn-close position-absolute m-0 gray-shadow"
+                                data-bs-dismiss="modal" aria-label="Close">
+                        </button>
+                    </div>
+                    <!-- 模态框头部 [end] -->
+
+                    <!-- 模态框内容 [start] -->
+                    <div class="modal-body mb-2">
+
+                        <!-- 指定页码 [start] -->
+                        <form action="{{ url_for('main.index') }}" method="get" name="jump-page">
+
+                            <input type="text" class="d-none" name="path" value="{{ current_dir_path }}"/>
+
+                            <div class="input-group mb-3">
+                                <input type="number" min="1" max="{{ num_page }}" class="form-control" name="page"
+                                       value="1"/>
+                                <span class="input-group-text my-input-group-text">页</span>
+                                <button class="btn btn-info" type="submit">跳转</button>
+                            </div>
+                        </form>
+                        <!-- 指定页码 [start] -->
+
+                    </div>
+                    <!-- 模态框内容 [end] -->
+
+                </div>
+            </div>
+        </div>
+        <!-- 跳转页码模态框 [end] -->
+    {% endif %}
 
 {% endblock modal %}
 
@@ -1087,6 +1129,65 @@
                 <p class="text-light text-center fs-5 my-5">没有文件</p>
             {% endif %}
             <!-- 当没有可见目录可显示时要显示的内容 [end] -->
+
+            <!-- 分页导航 [start] -->
+            {% if num_page and num_page > 1 %}
+                <nav id="file-pagination" aria-label="page-navigation">
+                    <ul class="pagination justify-content-center mb-5">
+
+                        {% if num_page <= 5 %}
+
+                            {# 总页数小于等于5时，显示所有页码 [start] #}
+                            {% for page in range(1, num_page + 1) %}
+                                {% if page == current_page %}
+                                    {{ component.active_page_link(page) }}
+                                {% else %}
+                                    {{ component.normal_page_link(current_dir_path, page) }}
+                                {% endif %}
+                            {% endfor %}
+                            {# 总页数小于等于5时，显示所有页码 [end] #}
+
+                        {% elif num_page > 5 %}
+
+                            {# 总页数大于5时，不显示所有页码 [start] #}
+                            {% if current_page == 1 %}
+
+                                {{ component.active_page_link(1) }}
+                                {{ component.normal_page_link(current_dir_path, 2) }}
+                                {{ component.ellipsis_page_link() }}
+                                {{ component.normal_page_link(current_dir_path, num_page) }}
+                                {{ component.next_page_link(current_dir_path, 2) }}
+
+                            {% elif 2 <= current_page <= num_page - 2 %}
+
+                                {{ component.prev_page_link(current_dir_path, current_page - 1) }}
+                                {{ component.active_page_link(current_page) }}
+                                {{ component.ellipsis_page_link() }}
+                                {{ component.normal_page_link(current_dir_path, num_page) }}
+                                {{ component.next_page_link(current_dir_path, current_page + 1) }}
+
+                            {% else %}
+
+                                {{ component.prev_page_link(current_dir_path, current_page - 1) }}
+                                {{ component.normal_page_link(current_dir_path, 1) }}
+                                {{ component.ellipsis_page_link() }}
+                                {% if current_page == num_page - 1 %}
+                                    {{ component.active_page_link(current_page) }}
+                                    {{ component.normal_page_link(current_dir_path, num_page) }}
+                                {% else %}
+                                    {{ component.normal_page_link(current_dir_path, num_page - 1) }}
+                                    {{ component.active_page_link(current_page) }}
+                                {% endif %}
+
+                            {% endif %}
+                            {# 总页数大于5时，不显示所有页码 [end] #}
+
+                        {% endif %}
+
+                    </ul>
+                </nav>
+            {% endif %}
+            <!-- 分页导航 [end] -->
 
         </div>
     </div>

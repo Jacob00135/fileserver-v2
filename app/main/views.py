@@ -1,6 +1,6 @@
 import os
 import shutil
-from time import time as get_timestamp
+from math import ceil
 from urllib.parse import quote
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, request, abort, send_from_directory, redirect, url_for, flash, jsonify, \
@@ -9,8 +9,8 @@ from flask_login import current_user, login_required
 from config import ErrorInfo, Config
 from app import after_response
 from app.model import VisibleDir
-from app.untils import get_upper_path, sort_file_list, get_nav_path, check_path_query_param, admin_required, \
-    check_filename, get_dir_struct, compress_file
+from app.untils import get_upper_path, get_nav_path, check_path_query_param, admin_required, check_filename, \
+    get_dir_struct, compress_file
 from app.path_untils import MountPath, DirPath, create_path_object, get_file_size
 
 main = Blueprint('main', __name__)
@@ -45,21 +45,35 @@ def index():
             as_attachment=False
         )
 
-    # 响应目录
+    # 实例化
     if os.path.ismount(path):
         p = MountPath(path)
     else:
         p = DirPath(path)
-    upper_path = get_upper_path(p, current_user.permission)
+
+    # 分页
+    num_page = ceil(len(os.listdir(path)) / Config.PAGE_MAX_FILE_NUMBER)
+    page = request.args.get('page', 1, type=int)
+    if page <= 0:
+        page = 1
+    elif page > num_page:
+        page = num_page
+    index_start = Config.PAGE_MAX_FILE_NUMBER * (page - 1)
+    index_end = index_start + Config.PAGE_MAX_FILE_NUMBER
+    p.read_section = (index_start, index_end)
+
+    # 响应
     return render_template(
         'main/index.html',
-        file_list=sort_file_list(p.children),  # 要展示的文件列表
+        file_list=p.children,  # 要展示的文件列表
         root_page=False,  # 是否是根页面
-        upper_path=upper_path,  # 上一级路径
+        upper_path=get_upper_path(p, current_user.permission),  # 上一级路径
         current_dir_path=p.path,  # 当前目录绝对路径
         nav_path=get_nav_path(p),  # 面包屑导航路径
         UPLOAD_FILE_MAX_SIZE=Config.MAX_CONTENT_LENGTH,  # 上传文件的最大字节
-        UPLOAD_FILE_HINT_INFO=Config.UPLOAD_FILE_TOO_LARGE_ERROR  # 上传文件提示信息
+        UPLOAD_FILE_HINT_INFO=Config.UPLOAD_FILE_TOO_LARGE_ERROR,  # 上传文件提示信息
+        current_page=page,  # 当前页码
+        num_page=num_page  # 最大页码
     )
 
 
