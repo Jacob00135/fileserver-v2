@@ -8,7 +8,7 @@
 
     // 登出按钮
     (() => {
-        const logoutLink = document.querySelector('#navbar-menu .logout');
+        const logoutLink = document.querySelector('#top-navbar .logout');
         if (!logoutLink) return undefined;
         logoutLink.addEventListener('click', () => {
             document.forms['logout'].submit();

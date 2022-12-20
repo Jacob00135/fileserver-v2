@@ -29,7 +29,7 @@
         'audio': 'bi bi-music-note-beamed',
         'text': 'bi bi-file-text',
         'unknown': 'bi bi-question-square'
-        } %}
+    } %}
     {# 全局变量：文件类型与图标类映射表 [end] #}
 
     <!-- 代替alert的提示模态框 [start] -->
@@ -111,7 +111,6 @@
         </div>
         <!-- 登录模态框 [end] -->
     {% endif %}
-
 
     <!-- 跳转路径模态框 [start] -->
     <div class="modal fade" id="jump-path-modal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
@@ -215,94 +214,157 @@
     <!-- 用于继承的模态框块 [end] -->
 
     <!-- 导航栏 [start] -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="top-navbar">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="top-navbar">
         <div class="container-md">
 
-            <!-- 主页图标 [start] -->
-            <a class="navbar-brand px-3 rounded-2" href="{{ url_for('main.index') }}">
-                <i class="bi bi-folder"></i>
-            </a>
-            <!-- 主页图标 [end] -->
+            <!-- 平板宽度下显示的内容 [start] -->
+            <div class="d-flex justify-content-between w-100 d-lg-none min-top-navbar">
 
-            <!-- 跳转目录按钮 [start] -->
-            <a class="navbar-brand px-3 rounded-2" href="javascript:;" data-bs-toggle="modal" data-bs-target="#jump-path-modal">
-                <i class="bi bi-box-arrow-up-right"></i>
-            </a>
-            <!-- 跳转目录按钮 [end] -->
+                <!-- 展开左侧导航栏按钮 [start] -->
+                <a class="navbar-brand rounded-2 px-3 d-block me-0" data-bs-toggle="offcanvas"
+                   href="#left-navbar" role="button" aria-controls="left-navbar">
+                    <i class="bi bi-list"></i>
+                </a>
+                <!-- 展开左侧导航栏按钮 [end] -->
 
-            <!-- 菜单按钮 [start] -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu"
-                    aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <!-- 菜单按钮 [start] -->
+                <!-- 主页图标 [start] -->
+                <a class="navbar-brand rounded-2 px-3 d-block me-0" href="{{ url_for('main.index') }}">
+                    <i class="bi bi-house"></i>
+                </a>
+                <!-- 主页图标 [end] -->
+
+                <!-- 搜索按钮 [start] -->
+                <a class="navbar-brand rounded-2 px-3 d-block me-0" href="{{ url_for('main.index') }}">
+                    <i class="bi bi-search"></i>
+                </a>
+                <!-- 搜索按钮 [end] -->
+
+            </div>
+            <!-- 平板宽度下显示的内容 [end] -->
+
             <!-- 导航栏内容 [start] -->
-            <div class="collapse navbar-collapse justify-content-between" id="navbar-menu">
+            <div class="offcanvas-lg offcanvas-start text-bg-dark" tabindex="-1" id="left-navbar">
 
-                <!-- 靠左的内容 [start] -->
-                <ul class="navbar-nav">
-                </ul>
-                <!-- 靠左的内容 [end] -->
-                <!-- 靠右的内容 [start] -->
-                <ul class="navbar-nav">
+                <!-- 左侧导航栏头部 [start] -->
+                <div class="offcanvas-header border-bottom border-secondary">
+                    <h5 class="offcanvas-title">导航</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                            data-bs-target="#left-navbar" aria-label="Close"></button>
+                </div>
+                <!-- 左侧导航栏头部 [end] -->
 
-                    <!-- 登录、登出按钮 [start] -->
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <form class="d-none" action="{{ url_for('auth.logout') }}" method="post" name="logout">
-                        </form>
-                        <a class="nav-link rounded-2 px-3 logout" href="javascript:;">登出</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link rounded-2 px-3" href="javascript:;" data-bs-toggle="modal"
-                           data-bs-target="#login-modal">登录</a>
-                    </li>
-                    {% endif %}
-                    <!-- 登录、登出按钮 [end] -->
-                    <!-- 修改密码按钮 [start] -->
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link rounded-2 px-3" href="javascript:;" data-bs-toggle="modal"
-                           data-bs-target="#update-password-modal">修改密码</a>
-                    </li>
-                    {% endif %}
-                    <!-- 修改密码按钮 [end] -->
-                    <!-- 管理员功能下拉菜单 [start] -->
-                    {% if current_user.is_admin() %}
-                    <li class="nav-item dropdown navbar-admin-dropdown">
+                <!-- 可折叠的导航栏内容 [start] -->
+                <div class="offcanvas-body flex-lg-row justify-content-lg-between flex-md-column px-0">
 
-                        <!-- 下拉菜单头 [start] -->
-                        <a class="nav-link dropdown-toggle rounded-2 px-3" href="javascript:;"
-                           id="navbar-admin-dropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            管理
-                        </a>
-                        <!-- 下拉菜单头 [end] -->
-                        <!-- 下拉菜单条目 [start] -->
-                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbar-admin-dropdown">
-                            <li>
-                                <a class="dropdown-item visible-dir" href="{{ url_for('auth.visible_dir_manage') }}">
-                                    可见目录
+                    <!-- 靠左的内容 [start] -->
+                    <ul class="navbar-nav">
+
+                        <!-- 主页图标 [start] -->
+                        <li class="nav-item">
+                            <a class="nav-link px-3 d-block me-0 me-lg-3" href="{{ url_for('main.index') }}">
+                                <i class="bi bi-house"></i>
+                                <span class="ms-2">主页</span>
+                            </a>
+                        </li>
+                        <!-- 主页图标 [end] -->
+
+                        <!-- 跳转目录按钮 [start] -->
+                        <li class="nav-item">
+                            <a class="nav-link px-3 d-block me-0" href="javascript:;"
+                               data-bs-toggle="modal" data-bs-target="#jump-path-modal">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                <span class="ms-2">跳转</span>
+                            </a>
+                        </li>
+                        <!-- 跳转目录按钮 [end] -->
+
+                    </ul>
+                    <!-- 靠左的内容 [end] -->
+
+                    <!-- 靠右的内容 [start] -->
+                    <ul class="navbar-nav">
+
+                        <!-- 登录按钮 [start] -->
+                        {% if not current_user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link px-3" href="javascript:;" data-bs-toggle="modal"
+                                   data-bs-target="#login-modal">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                    <span class="ms-2">登录</span>
                                 </a>
                             </li>
-                            <li>
-                                <a class="dropdown-item user-manage" href="{{ url_for('auth.user_manage') }}">
-                                    用户管理
+                        {% endif %}
+                        <!-- 登录按钮 [end] -->
+
+                        <!-- 管理员功能下拉菜单 [start] -->
+                        {% if current_user.is_admin() %}
+                            <li class="nav-item dropdown navbar-admin-dropdown">
+
+                                <!-- 下拉菜单头 [start] -->
+                                <a class="nav-link dropdown-toggle px-3" href="javascript:;"
+                                   id="navbar-admin-dropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person"></i>
+                                    <span class="ms-2">管理</span>
+                                </a>
+                                <!-- 下拉菜单头 [end] -->
+
+                                <!-- 下拉菜单条目 [start] -->
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbar-admin-dropdown">
+                                    <li>
+                                        <a class="dropdown-item visible-dir"
+                                           href="{{ url_for('auth.visible_dir_manage') }}">
+                                            <i class="bi bi-folder2-open"></i>
+                                            <span class="ms-2">可见目录</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item user-manage" href="{{ url_for('auth.user_manage') }}">
+                                            <i class="bi bi-person-circle"></i>
+                                            <span class="ms-2">用户管理</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- 下拉菜单条目 [end] -->
+
+                            </li>
+                        {% endif %}
+                        <!-- 管理员功能下拉菜单 [end] -->
+
+                        <!-- 修改密码按钮 [start] -->
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link px-3" href="javascript:;" data-bs-toggle="modal"
+                                   data-bs-target="#update-password-modal">
+                                    <i class="bi bi-shield-shaded"></i>
+                                    <span class="ms-2">修改密码</span>
                                 </a>
                             </li>
-                        </ul>
-                        <!-- 下拉菜单条目 [end] -->
+                        {% endif %}
+                        <!-- 修改密码按钮 [end] -->
 
-                    </li>
-                    {% endif %}
-                    <!-- 管理员功能下拉菜单 [end] -->
+                        <!-- 登出按钮 [start] -->
+                        {% if current_user.is_authenticated %}
+                            <li class="nav-item">
+                                <form class="d-none" action="{{ url_for('auth.logout') }}" method="post" name="logout">
+                                </form>
+                                <a class="nav-link px-3 logout" href="javascript:;">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span class="ms-2">登出</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <!-- 登出按钮 [end] -->
 
-                </ul>
-                <!-- 靠右的内容 [end] -->
+                    </ul>
+                    <!-- 靠右的内容 [end] -->
+
+                </div>
+                <!-- 可折叠的导航栏内容 [end] -->
 
             </div>
             <!-- 导航栏内容 [end] -->
+
         </div>
     </nav>
     <!-- 导航栏 [end] -->
