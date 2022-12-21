@@ -1,0 +1,12 @@
+@import "_variable.scss";
+
+@mixin file_type_icon_color() {
+    @for $i from 1 through 7 {
+        $t: nth($file-type, $i);
+        $c: nth($icon-color, $i);
+
+        .bi[data-file-type="#{$t}"] {
+            color: $c !important;
+        }
+    }
+}

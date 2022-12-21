@@ -42,8 +42,6 @@ def is_legal_path(path: str) -> bool:
 
 
 def get_file_type(filepath: str) -> str:
-    if os.path.isdir(filepath):
-        return 'dir'
     i = filepath.rfind('.')
     if i == -1:
         return 'unknown'
@@ -290,7 +288,8 @@ def get_children(path: str, read_section: tuple = (0, None), sort_by_type: bool 
             'unknown': []
         })
         for filename in os.listdir(path):
-            file_type = get_file_type(os.path.realpath(os.path.join(path, filename)))
+            file_path = os.path.realpath(os.path.join(path, filename))
+            file_type = 'dir' if os.path.isdir(file_path) else get_file_type(file_path)
             file_map[file_type].append(filename)
         file_list = []
         while file_map:
@@ -319,6 +318,19 @@ def create_path_object(visible_dir_list: list) -> list:
             obj = DirPath(visible_dir.dir_path)
         object_list.append(obj)
     return object_list
+
+
+def search_file_on_dir(dir_path: str, keyword: str) -> iter:
+    for father, sub_dirs, sub_files in os.walk(dir_path):
+        for sub_dir in sub_dirs:
+            start = sub_dir.find(keyword)
+            if start >= 0:
+                yield 'dir', start, sub_dir, os.path.realpath(os.path.join(father, sub_dir))
+        for sub_file in sub_files:
+            start = sub_file.find(keyword)
+            if start >= 0:
+                file_path = os.path.realpath(os.path.join(father, sub_file))
+                yield get_file_type(file_path), start, sub_file, file_path
 
 
 if __name__ == '__main__':

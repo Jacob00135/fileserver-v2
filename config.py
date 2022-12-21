@@ -139,6 +139,12 @@ class ErrorInfo(object):
     COMPRESS_FILE_EXISTS = '同名压缩包已存在！'
     COMPRESS_TYPE_ERROR = '压缩文件算法只能是`仅存储`、`zip`、`lzma`'
 
+    # 搜索文件
+    SEARCH_FILE_DIR_ILLEGAL = '没有权限访问'
+    SEARCH_FILE_NOT_ISDIR = '不能在非目录路径下进行搜索！'
+    SEARCH_FILE_KEYWORD_EMPTY = '搜索关键字不能为空！'
+    SEARCH_FILE_NO_MATCH = '无匹配结果'
+
 
 class UserNameError(object):
     ILLEGAL_CHAR = Config.USER_NAME_ILLEGAL_CHAR

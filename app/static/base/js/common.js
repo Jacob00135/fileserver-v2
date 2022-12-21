@@ -31,7 +31,7 @@
                 path.slice(0, index),
                 path.slice(index + 1)
             ];
-        },
+        }
     };
 
     window.MyAJAX = {
@@ -69,6 +69,18 @@
                     }
                 });
             });
+        }
+    };
+
+    window.globalVariable = {
+        fileTypeIconMap: {
+            'dir': 'bi bi-folder2',
+            'package': 'bi bi-file-zip',
+            'video': 'bi bi-camera-video',
+            'image': 'bi bi-image',
+            'audio': 'bi bi-music-note-beamed',
+            'text': 'bi bi-file-text',
+            'unknown': 'bi bi-question-square'
         }
     };
 

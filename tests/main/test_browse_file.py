@@ -1,5 +1,6 @@
 import os.path
-from config import BASE_PATH
+from urllib.parse import quote
+from config import BASE_PATH, ErrorInfo
 from app import db
 from app.model import Users, VisibleDir
 from tests.base.test_base import BaseUnittestCase
@@ -62,3 +63,60 @@ class BrowseFileTestCase(BaseUnittestCase):
             follow_redirects=True
         )
         self.assertTrue(response.status_code == 200)
+
+    def test_search_file_permission(self):
+        """搜索文件：无权限"""
+        response = self.client.get(
+            self.url_for('main.search_file', keyword='main') + '&dir-path=' + quote(BASE_PATH),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json['status'] == 0)
+        self.assertTrue(response.json['message'] == ErrorInfo.SEARCH_FILE_DIR_ILLEGAL)
+
+    def test_search_file_nodir(self):
+        """搜索文件：要搜索的目录路径不是目录"""
+        response = self.client.get(
+            self.url_for('main.search_file', keyword='main') + '&dir-path=' + quote(
+                os.path.realpath(os.path.join(BASE_PATH, 'app/static/_variable.scss'))
+            ),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json['status'] == 0)
+        self.assertTrue(response.json['message'] == ErrorInfo.SEARCH_FILE_NOT_ISDIR)
+
+    def test_search_file_empty(self):
+        """搜索文件：搜索关键字为空"""
+        response = self.client.get(
+            self.url_for('main.search_file') + '?dir-path=' + quote(
+                os.path.realpath(os.path.join(BASE_PATH, 'app/static'))
+            ),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json['status'] == 0)
+        self.assertTrue(response.json['message'] == ErrorInfo.SEARCH_FILE_KEYWORD_EMPTY)
+
+    def test_search_file_no_match(self):
+        """搜索文件：无匹配"""
+        response = self.client.get(
+            self.url_for('main.search_file', keyword='\\/:*?"<>|') + '&dir-path=' + quote(
+                os.path.realpath(os.path.join(BASE_PATH, 'app/static'))
+            ),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json['status'] == 0)
+        self.assertTrue(response.json['message'] == ErrorInfo.SEARCH_FILE_NO_MATCH)
+
+    def test_search_file(self):
+        """搜索文件：成功"""
+        self.login('admin', '123456')
+        response = self.client.get(
+            self.url_for('main.search_file', keyword='main') + '&dir-path=' + quote(BASE_PATH),
+            follow_redirects=True
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.json['status'] == 1)
+        self.assertTrue(len(response.json['result']) > 0)

@@ -1,5 +1,6 @@
 @charset "UTF-8";
 /* 文件图标颜色相关的变量 */
+/* 文件图标颜色相关的变量 */
 #app .dir-path-nav .breadcrumb-item::before {
   color: #F8F9FA;
 }
@@ -130,6 +131,45 @@
 }
 #multi-download-modal form[name=multi-download] .loading .hint-text {
   line-height: 2rem;
+}
+
+#search-modal .modal-dialog {
+  margin-top: 60px;
+}
+@media (min-width: 992px) {
+  #search-modal .modal-dialog {
+    margin-top: 124px;
+  }
+}
+#search-modal .search-result .list > .list-group-item .bi[data-file-type=dir] {
+  color: #ffdc78 !important;
+}
+#search-modal .search-result .list > .list-group-item .bi[data-file-type=package] {
+  color: #000 !important;
+}
+#search-modal .search-result .list > .list-group-item .bi[data-file-type=video] {
+  color: #70c3ff !important;
+}
+#search-modal .search-result .list > .list-group-item .bi[data-file-type=image] {
+  color: #c4fff1 !important;
+}
+#search-modal .search-result .list > .list-group-item .bi[data-file-type=audio] {
+  color: #f6801f !important;
+}
+#search-modal .search-result .list > .list-group-item .bi[data-file-type=text] {
+  color: #aedfd0 !important;
+}
+#search-modal .search-result .list > .list-group-item .bi[data-file-type=unknown] {
+  color: #F8F9FA !important;
+}
+#search-modal .search-result .link {
+  transition: all 0.15s;
+}
+#search-modal .search-result .link:hover {
+  background-color: #212529;
+}
+#search-modal .search-result .file-path {
+  color: #FFFFFFB2;
 }
 
 #app .file-list .action-dropdown [id^=action-dropdown-btn] {

@@ -97,14 +97,13 @@ body {
     }
 
     /* 下拉菜单的弹出位置 */
-    .navbar-admin-dropdown {
-        .dropdown-menu {
-            left: auto;
-            right: 0;
-        }
-    }
+    //.navbar-admin-dropdown {
+    //    .dropdown-menu {
+    //        left: auto;
+    //        right: 0;
+    //    }
+    //}
 }
-
 /* 导航栏 [end] */
 
 /* 模态框共用样式 [start] */
@@ -116,5 +115,4 @@ body {
         right: 1rem;
     }
 }
-
 /* 模态框共用样式 [end] */

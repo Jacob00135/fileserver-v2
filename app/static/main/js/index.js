@@ -873,4 +873,67 @@
         });
     })();
 
+    // 搜索按钮
+    (() => {
+        const modal = document.getElementById('search-modal');
+        if (!modal) return undefined;
+        const form = document.forms['search-file'];
+
+        document.querySelectorAll('#top-navbar .search-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                modal.querySelector('.loading').classList.add('d-none');
+                modal.querySelector('.search-result').classList.add('d-none');
+                modal.querySelector('.no-result').classList.add('d-none');
+                (new bootstrap.Modal(modal, {keyboard: false})).show();
+            });
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            form.querySelector('[type="submit"]').setAttribute('disabled', '');
+            modal.querySelector('.no-result').classList.add('d-none');
+            modal.querySelector('.search-result').classList.add('d-none');
+            modal.querySelector('.loading').classList.remove('d-none');
+
+            // ajax请求、渲染
+            const dirPath = form.querySelector('input[name="dir-path"]').value;
+            const keyword = form.querySelector('input[name="keyword"]').value;
+            const url = form.action + '?dir-path=' + dirPath + '&keyword=' + keyword;
+            MyAJAX.getJson(url).then(
+                (data) => {
+                    const htmlList = [];
+                    data.result.forEach((item) => {
+                        const html = `<li class="list-group-item bg-secondary p-0 border-dark">
+                            <a class="text-decoration-none text-light flex-fill px-3 py-2 d-flex flex-column link"
+                               href="{{ file_link }}" title="{{ file_path }}">
+                                <div class="d-flex file-name">
+                                    <i class="{{ file_icon }} me-1 align-self-center fs-5"
+                                       data-file-type="{{ file_type }}"></i>
+                                    <span class="fs-5 text-truncate flex-fill text">{{ filename }}</span>
+                                </div>
+                                <div class="text-truncate file-path">{{ file_path }}</div>
+                            </a>
+                        </li>`
+                            .replace('{{ file_link }}', item['file_link'])
+                            .replace('{{ file_icon }}', globalVariable.fileTypeIconMap[item['file_type']])
+                            .replace('{{ file_type }}', item['file_type'])
+                            .replace('{{ filename }}', item['filename'])
+                            .replace(/\{\{ file_path \}\}/g, item['file_path'])
+                        htmlList.push(html);
+                    });
+
+                    modal.querySelector('.search-result .list').innerHTML = htmlList.join('');
+                    modal.querySelector('.search-result').classList.remove('d-none');
+                    modal.querySelector('.loading').classList.add('d-none');
+                    form.querySelector('[type="submit"]').removeAttribute('disabled');
+                },
+                (data) => {
+                    modal.querySelector('.no-result').classList.remove('d-none');
+                    modal.querySelector('.loading').classList.add('d-none');
+                    form.querySelector('[type="submit"]').removeAttribute('disabled');
+                }
+            );
+        });
+    })();
+
 })(window, document);

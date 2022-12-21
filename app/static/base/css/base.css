@@ -81,10 +81,6 @@ body #app {
     border-radius: 0;
   }
 }
-#top-navbar .navbar-admin-dropdown .dropdown-menu {
-  left: auto;
-  right: 0;
-}
 
 /* 导航栏 [end] */
 /* 模态框共用样式 [start] */

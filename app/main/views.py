@@ -12,7 +12,7 @@ from app import after_response
 from app.model import VisibleDir
 from app.untils import get_upper_path, get_nav_path, check_path_query_param, admin_required, check_filename, \
     get_dir_struct, compress_file
-from app.path_untils import MountPath, DirPath, create_path_object, get_file_size
+from app.path_untils import MountPath, DirPath, create_path_object, get_file_size, search_file_on_dir
 
 main = Blueprint('main', __name__)
 
@@ -575,3 +575,52 @@ def compress_multi_file():
         flash(ErrorInfo.COMPRESS_TYPE_ERROR)
 
     return redirect(url_for('main.index', path=dir_path))
+
+
+@main.route('/search')
+def search_file():
+    # 检查是否有权限、是否是可见目录
+    dir_path = request.args.get('dir-path', '', type=str)
+    if not check_path_query_param(dir_path):
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.SEARCH_FILE_DIR_ILLEGAL
+        })
+    dir_path = os.path.realpath(dir_path)
+
+    # 检查是否是目录
+    if not os.path.isdir(dir_path):
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.SEARCH_FILE_NOT_ISDIR
+        })
+
+    # 检查搜索关键字
+    keyword = request.args.get('keyword', '', type=str)
+    if not keyword:
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.SEARCH_FILE_KEYWORD_EMPTY
+        })
+
+    # 搜索
+    result = []
+    for file_type, start, filename, file_path in search_file_on_dir(dir_path, keyword):
+        result.append({
+            'file_type': file_type,
+            'start': start,
+            'filename': filename,
+            'file_path': file_path,
+            'file_link': url_for('main.index', path=file_path)
+        })
+
+    # 响应
+    if not result:
+        return jsonify({
+            'status': 0,
+            'message': ErrorInfo.SEARCH_FILE_NO_MATCH
+        })
+    return jsonify({
+        'status': 1,
+        'result': result
+    })
