@@ -1,4 +1,4 @@
-.venv\scripts\activate
+.\venv\scripts\activate
 $env:FLASK_APP="file_server.py"
 $env:FLASK_ENV="production"
 $env:FLASK_DEBUG="0"
