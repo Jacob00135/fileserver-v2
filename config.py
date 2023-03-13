@@ -28,7 +28,9 @@ class Config(object):
     USER_PASSWORD_ILLEGAL_CHAR = '[^a-zA-Z0-9@()_-]'
 
     # 分页时，每一页能显示的条目数
-    PAGE_MAX_FILE_NUMBER = 20
+    PAGE_MAX_FILE_NUMBER = int(os.environ.get('FLASK_PAGE_MAX', 20))
+    print(type(PAGE_MAX_FILE_NUMBER))
+    print(PAGE_MAX_FILE_NUMBER)
 
     @staticmethod
     def init_app(app):
