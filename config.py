@@ -29,8 +29,6 @@ class Config(object):
 
     # 分页时，每一页能显示的条目数
     PAGE_MAX_FILE_NUMBER = int(os.environ.get('FLASK_PAGE_MAX', 20))
-    print(type(PAGE_MAX_FILE_NUMBER))
-    print(PAGE_MAX_FILE_NUMBER)
 
     @staticmethod
     def init_app(app):
